@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace DevLnk\MoonShineBuilder\Commands;
 
 use DevLnk\LaravelCodeBuilder\Services\CodeStructure\Factories\CodeStructureFromMysql;

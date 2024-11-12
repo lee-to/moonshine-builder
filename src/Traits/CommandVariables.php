@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace DevLnk\MoonShineBuilder\Traits;
 
 use DevLnk\LaravelCodeBuilder\Enums\BuildTypeContract;
