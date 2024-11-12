@@ -124,7 +124,7 @@ final class CodeStructureList
                     $column->column() === 'moonshine_user_id'
                     && $column->type() === SqlTypeMap::BELONGS_TO
                 ) {
-                    $field['resource_class'] = "\\MoonShine\\Resources\\MoonShineUserResource";
+                    $field['resource_class'] = "\\MoonShine\\Laravel\\Resources\\MoonShineUserResource";
                 }
 
                 $fields[] = $field;

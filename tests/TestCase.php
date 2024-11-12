@@ -9,8 +9,8 @@ use DevLnk\MoonShineBuilder\Tests\Fixtures\TestServiceProvider;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Config;
-use MoonShine\Commands\InstallCommand;
-use MoonShine\Providers\MoonShineServiceProvider;
+use MoonShine\Laravel\Commands\InstallCommand;
+use MoonShine\Laravel\Providers\MoonShineServiceProvider;
 
 class TestCase extends \Orchestra\Testbench\TestCase
 {
@@ -35,13 +35,12 @@ class TestCase extends \Orchestra\Testbench\TestCase
         Config::set('moonshine.dir', 'vendor/orchestra/testbench-core/laravel/app/MoonShine');
 
         $this->artisan(InstallCommand::class, [
-            '--without-user' => true,
-            '--without-migrations' => true,
+            '--tests-mode' => true,
         ]);
 
         $this->artisan('vendor:publish --tag=moonshine-builder');
 
-        $this->artisan('config:clear');
+        $this->artisan('optimize:clear');
 
         $dir = base_path('builds');
         if(! is_dir($dir)) {

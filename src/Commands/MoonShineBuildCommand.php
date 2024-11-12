@@ -214,7 +214,7 @@ class MoonShineBuildCommand extends LaravelCodeBuildCommand
         $code = implode(PHP_EOL, $this->reminderResourceInfo);
         note($code);
 
-        note("...or in the menu method:");
+        note("...and in the menu");
 
         $code = implode(PHP_EOL, $this->reminderMenuInfo);
         note($code);

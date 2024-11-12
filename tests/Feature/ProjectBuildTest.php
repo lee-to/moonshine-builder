@@ -51,8 +51,8 @@ class ProjectBuildTest extends TestCase
 
         $resource = $this->filesystem->get($resourcePath);
         $resourceStringContains = [
-            "use MoonShine\Fields\ID;",
-            "use MoonShine\Fields\Text;",
+            "use MoonShine\UI\Fields\ID;",
+            "use MoonShine\UI\Fields\Text;",
             "protected string \$column = 'name';",
             "ID::make('id')",
             "Text::make('Name', 'name')",
@@ -94,22 +94,22 @@ class ProjectBuildTest extends TestCase
 
         $resource = $this->filesystem->get($resourcePath);
         $resourceStringContains = [
-            "use MoonShine\Fields\ID;",
-            "use MoonShine\Fields\Text;",
-            "use MoonShine\Fields\Number;",
-            "use MoonShine\Fields\Relationships\BelongsTo;",
-            "use MoonShine\Fields\Relationships\HasMany;",
-            "use MoonShine\Fields\Checkbox;",
+            "use MoonShine\UI\Fields\ID;",
+            "use MoonShine\UI\Fields\Text;",
+            "use MoonShine\UI\Fields\Number;",
+            "use MoonShine\Laravel\Fields\Relationships\BelongsTo;",
+            "use MoonShine\Laravel\Fields\Relationships\HasMany;",
+            "use MoonShine\UI\Fields\Checkbox;",
             "@extends ModelResource<Product>",
-            "protected array \$with = ['category','comments','moonshineUser'];",
-            "ID::make('id')\n\t\t\t\t\t->sortable()",
+            "protected array \$with = ['category', 'comments', 'moonshineUser'];",
+            "ID::make('id')\n\t\t\t\t->sortable()",
             "Text::make('Name', 'title')",
             "Text::make('Content', 'content')",
-            "Number::make('Price', 'price')\n\t\t\t\t\t->default(0)\n\t\t\t\t\t->sortable()",
+            "Number::make('Price', 'price')\n\t\t\t\t->default(0)\n\t\t\t\t->sortable()",
             "Number::make('Sorting', 'sort_number')",
-            "BelongsTo::make('Category', 'category', resource: new CategoryResource())",
-            "HasMany::make('Comments', 'comments', resource: new CommentResource())\n\t\t\t\t\t->creatable()",
-            "BelongsTo::make('User', 'moonshineUser', resource: new \\MoonShine\\Resources\\MoonShineUserResource())",
+            "BelongsTo::make('Category', 'category', resource: CategoryResource::class)",
+            "HasMany::make('Comments', 'comments', resource: CommentResource::class)->creatable()",
+            "BelongsTo::make('User', 'moonshineUser', resource: \\MoonShine\\Laravel\\Resources\\MoonShineUserResource::class)",
             "Checkbox::make('Active', 'is_active')",
             "'id' => ['int', 'nullable']",
             "'title' => ['string', 'nullable']",
@@ -137,7 +137,7 @@ class ProjectBuildTest extends TestCase
             "public function comments(): HasMany",
             "return \$this->hasMany(Comment::class, 'product_id');",
             "public function moonshineUser(): BelongsTo",
-            "return \$this->belongsTo(\\MoonShine\\Models\\MoonshineUser::class, 'moonshine_user_id');",
+            "return \$this->belongsTo(\\MoonShine\\Laravel\\Models\\MoonshineUser::class, 'moonshine_user_id');",
         ];
         foreach ($modelContains as $stringContain) {
             $this->assertStringContainsString($stringContain, $model);
@@ -153,7 +153,7 @@ class ProjectBuildTest extends TestCase
             "table->text('content');",
             "table->unsignedInteger('price')->default(0)->index()",
             "table->foreignIdFor(\App\Models\Category::class)\n\t\t\t\t->constrained()\n\t\t\t\t->cascadeOnDelete()\n\t\t\t\t->cascadeOnUpdate()",
-            "table->foreignIdFor(\MoonShine\Models\MoonshineUser::class)\n\t\t\t\t->constrained()\n\t\t\t\t->cascadeOnDelete()\n\t\t\t\t->cascadeOnUpdate()",
+            "table->foreignIdFor(\\MoonShine\\Laravel\\Models\\MoonshineUser::class)\n\t\t\t\t->constrained()\n\t\t\t\t->cascadeOnDelete()\n\t\t\t\t->cascadeOnUpdate()",
             "table->boolean('is_active')->default(0);",
             "table->timestamps();",
             "table->softDeletes();",
@@ -173,15 +173,15 @@ class ProjectBuildTest extends TestCase
 
         $resource = $this->filesystem->get($resourcePath);
         $resourceStringContains = [
-            "use MoonShine\Fields\ID;",
-            "use MoonShine\Fields\Text;",
-            "use MoonShine\Fields\Relationships\BelongsTo;",
+            "use MoonShine\UI\Fields\ID;",
+            "use MoonShine\UI\Fields\Text;",
+            "use MoonShine\Laravel\Fields\Relationships\BelongsTo;",
             "@extends ModelResource<Comment>",
             "class CommentResource extends ModelResource",
             "ID::make('id')",
             "Text::make('Comment', 'comment')",
-            "BelongsTo::make('Product', 'product', resource: new ProductResource())",
-            "BelongsTo::make('User', 'moonshineUser', resource: new \MoonShine\Resources\MoonShineUserResource())",
+            "BelongsTo::make('Product', 'product', resource: ProductResource::class)",
+            "BelongsTo::make('User', 'moonshineUser', resource: \\MoonShine\\Laravel\\Resources\\MoonShineUserResource::class)",
         ];
         foreach ($resourceStringContains as $stringContain) {
             $this->assertStringContainsString($stringContain, $resource);
@@ -196,7 +196,7 @@ class ProjectBuildTest extends TestCase
             "public function product(): BelongsTo",
             "return \$this->belongsTo(Product::class, 'product_id');",
             "public function moonshineUser(): BelongsTo",
-            "return \$this->belongsTo(\MoonShine\Models\MoonshineUser::class, 'moonshine_user_id');",
+            "return \$this->belongsTo(\\MoonShine\\Laravel\\Models\\MoonshineUser::class, 'moonshine_user_id');",
         ];
         foreach ($modelContains as $stringContain) {
             $this->assertStringContainsString($stringContain, $model);
@@ -209,7 +209,7 @@ class ProjectBuildTest extends TestCase
             "Schema::create('comments', function (Blueprint \$table) {",
             "table->string('comment');",
             "table->foreignIdFor(\App\Models\Product::class)\n\t\t\t\t->constrained()\n\t\t\t\t->cascadeOnDelete()\n\t\t\t\t->cascadeOnUpdate()",
-            "table->foreignIdFor(\MoonShine\Models\MoonshineUser::class)\n\t\t\t\t->constrained()\n\t\t\t\t->cascadeOnDelete()\n\t\t\t\t->cascadeOnUpdate()",
+            "table->foreignIdFor(\\MoonShine\\Laravel\\Models\\MoonshineUser::class)\n\t\t\t\t->constrained()\n\t\t\t\t->cascadeOnDelete()\n\t\t\t\t->cascadeOnUpdate()",
         ];
         foreach ($migrationContains as $stringContain) {
             $this->assertStringContainsString($stringContain, $migration);

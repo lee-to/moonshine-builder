@@ -100,8 +100,8 @@
           "relation": {
             "table" : "moonshine_users"
           },
-          "model_class": "\\MoonShine\\Models\\MoonshineUser",
-          "resource_class": "\\MoonShine\\Resources\\MoonShineUserResource"
+          "model_class": "\\MoonShine\\Laravel\\Models\\MoonshineUser",
+          "resource_class": "\\MoonShine\\Laravel\\Resources\\MoonShineUserResource"
         },
         {
           "column": "is_active",
@@ -146,8 +146,8 @@
           "relation": {
             "table" : "moonshine_users"
           },
-          "model_class": "\\MoonShine\\Models\\MoonshineUser",
-          "resource_class": "\\MoonShine\\Resources\\MoonShineUserResource"
+          "model_class": "\\MoonShine\\Laravel\\Models\\MoonshineUser",
+          "resource_class": "\\MoonShine\\Laravel\\Resources\\MoonShineUserResource"
         }
       ]
     }

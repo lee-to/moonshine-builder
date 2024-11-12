@@ -63,12 +63,12 @@ class BelongsToManyBuildTest extends TestCase
 
         $resource = $this->filesystem->get($resourcePath);
         $resourceStringContains = [
-            "use MoonShine\Fields\ID;",
-            "use MoonShine\Fields\Text;",
-            "use MoonShine\Fields\Relationships\BelongsToMany;",
+            "use MoonShine\UI\Fields\ID;",
+            "use MoonShine\UI\Fields\Text;",
+            "use MoonShine\Laravel\Fields\Relationships\BelongsToMany;",
             "@extends ModelResource<Item>",
             "protected array \$with = ['properties'];",
-            "BelongsToMany::make('Properties', 'properties', resource: new PropertyResource())",
+            "BelongsToMany::make('Properties', 'properties', resource: PropertyResource::class)",
             "'id' => ['int', 'nullable']",
             "'title' => ['string', 'nullable']",
             "'properties' => ['array', 'nullable']",
@@ -111,12 +111,12 @@ class BelongsToManyBuildTest extends TestCase
 
         $resource = $this->filesystem->get($resourcePath);
         $resourceStringContains = [
-            "use MoonShine\Fields\ID;",
-            "use MoonShine\Fields\Text;",
-            "use MoonShine\Fields\Relationships\BelongsToMany;",
+            "use MoonShine\UI\Fields\ID;",
+            "use MoonShine\UI\Fields\Text;",
+            "use MoonShine\Laravel\Fields\Relationships\BelongsToMany;",
             "@extends ModelResource<Property>",
             "protected array \$with = ['items'];",
-            "BelongsToMany::make('Items', 'items', resource: new ItemResource())",
+            "BelongsToMany::make('Items', 'items', resource: ItemResource::class)",
             "'id' => ['int', 'nullable']",
             "'title' => ['string', 'nullable']",
             "'items' => ['array', 'nullable']",
