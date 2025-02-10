@@ -8,42 +8,21 @@ enum BuildType: string implements BuildTypeContract
 {
     case MODEL = 'model';
 
-    case ADD_ACTION = 'addAction';
+    case MIGRATION = 'migration';
 
-    case EDIT_ACTION = 'editAction';
-
-    case REQUEST = 'request';
-
-    case CONTROLLER = 'controller';
-
-    case ROUTE = 'route';
-
-    case FORM = 'form';
-
-    case DTO = 'DTO';
-
-    case TABLE = 'table';
-
-    case TYPE_SCRIPT = 'typeScript';
-
-    public function value(): string
-    {
-        return $this->value;
-    }
+    case RESOURCE = 'resource';
 
     public function stub(): string
     {
         return match ($this) {
             self::MODEL => 'Model',
-            self::ADD_ACTION => 'AddAction',
-            self::EDIT_ACTION => 'EditAction',
-            self::REQUEST => 'Request',
-            self::CONTROLLER => 'Controller',
-            self::ROUTE => 'Route',
-            self::FORM => 'Form',
-            self::DTO => 'DTO',
-            self::TABLE => 'Table',
-            self::TYPE_SCRIPT => 'TypeScript',
+            self::MIGRATION => 'Migration',
+            self::RESOURCE => 'ModelResourceDefault',
         };
+    }
+
+    public function value(): string
+    {
+        return $this->value;
     }
 }

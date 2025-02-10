@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace DevLnk\MoonShineBuilder\Structures\Factories;
+namespace DevLnk\MoonShineBuilder\Services\CodeStructure\Factories;
 
 use DevLnk\MoonShineBuilder\Enums\SqlTypeMap;
 use DevLnk\MoonShineBuilder\Services\CodeStructure\CodeStructure;
+use DevLnk\MoonShineBuilder\Services\CodeStructure\CodeStructureList;
 use DevLnk\MoonShineBuilder\Services\CodeStructure\ColumnStructure;
 use DevLnk\MoonShineBuilder\Services\CodeStructure\RelationStructure;
-use DevLnk\MoonShineBuilder\Structures\CodeStructureList;
 
 final readonly class StructureFromArray implements MakeStructureContract
 {

@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace DevLnk\MoonShineBuilder\Services\Builders;
 
-use DevLnk\MoonShineBuilder\Services\StubBuilder;
-use DevLnk\MoonShineBuilder\Enums\MoonShineBuildType;
+use DevLnk\MoonShineBuilder\Enums\BuildType;
 use DevLnk\MoonShineBuilder\Exceptions\ProjectBuilderException;
 use DevLnk\MoonShineBuilder\Services\Builders\Contracts\ResourceBuilderContract;
-use DevLnk\MoonShineBuilder\Structures\MoonShineStructure;
+use DevLnk\MoonShineBuilder\Services\CodeStructure\MoonShineStructure;
+use DevLnk\MoonShineBuilder\Services\StubBuilder;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
 
 class ResourceBuilder extends AbstractBuilder implements ResourceBuilderContract
@@ -23,10 +23,10 @@ class ResourceBuilder extends AbstractBuilder implements ResourceBuilderContract
     {
         $this->moonShineStructure = new MoonShineStructure($this->codeStructure);
 
-        $resourcePath = $this->codePath->path(MoonShineBuildType::RESOURCE->value);
-        $modelPath = $this->codePath->path(MoonShineBuildType::MODEL->value);
+        $resourcePath = $this->codePath->path(BuildType::RESOURCE->value);
+        $modelPath = $this->codePath->path(BuildType::MODEL->value);
 
-        $modelUse = class_exists($modelPath->namespace() . '\\' . $modelPath->rawName())
+        $modelUse = class_exists($modelPath->namespace() . '\\' . $modelPath->rawName(), false)
             ? "use {$modelPath->namespace()}\\{$modelPath->rawName()};"
             : "";
 

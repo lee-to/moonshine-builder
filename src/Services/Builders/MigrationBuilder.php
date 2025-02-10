@@ -7,7 +7,7 @@ namespace DevLnk\MoonShineBuilder\Services\Builders;
 use DevLnk\MoonShineBuilder\Enums\SqlTypeMap;
 use DevLnk\MoonShineBuilder\Services\CodeStructure\ColumnStructure;
 use DevLnk\MoonShineBuilder\Services\StubBuilder;
-use DevLnk\MoonShineBuilder\Enums\MoonShineBuildType;
+use DevLnk\MoonShineBuilder\Enums\BuildType;
 use DevLnk\MoonShineBuilder\Services\Builders\Contracts\MigrationBuilderContract;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
 
@@ -18,7 +18,7 @@ class MigrationBuilder extends AbstractBuilder implements MigrationBuilderContra
      */
     public function build(): void
     {
-        $migrationPath = $this->codePath->path(MoonShineBuildType::MIGRATION->value);
+        $migrationPath = $this->codePath->path(BuildType::MIGRATION->value);
 
         StubBuilder::make($this->stubFile)
             ->setKey(

@@ -5,7 +5,8 @@ declare(strict_types=1);
 namespace DevLnk\MoonShineBuilder\Commands;
 
 use DevLnk\MoonShineBuilder\Enums\BuildTypeContract;
-use DevLnk\MoonShineBuilder\Enums\MoonShineBuildType;
+use DevLnk\MoonShineBuilder\Enums\ParseType;
+use DevLnk\MoonShineBuilder\Enums\BuildType;
 use DevLnk\MoonShineBuilder\Exceptions\CodeGenerateCommandException;
 use DevLnk\MoonShineBuilder\Exceptions\ProjectBuilderException;
 use DevLnk\MoonShineBuilder\Services\Builders\Factory\AbstractBuildFactory;
@@ -13,9 +14,9 @@ use DevLnk\MoonShineBuilder\Services\Builders\Factory\MoonShineBuildFactory;
 use DevLnk\MoonShineBuilder\Services\CodePath\CodePathContract;
 use DevLnk\MoonShineBuilder\Services\CodePath\MoonShineCodePath;
 use DevLnk\MoonShineBuilder\Services\CodeStructure\CodeStructure;
+use DevLnk\MoonShineBuilder\Services\CodeStructure\Factories\MoonShineStructureFactory;
+use DevLnk\MoonShineBuilder\Services\CodeStructure\Factories\StructureFromMysql;
 use DevLnk\MoonShineBuilder\Services\StubBuilder;
-use DevLnk\MoonShineBuilder\Structures\Factories\StructureFromMysql;
-use DevLnk\MoonShineBuilder\Structures\Factories\MoonShineStructureFactory;
 use Illuminate\Console\Command;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Illuminate\Filesystem\Filesystem;
@@ -39,7 +40,7 @@ class MoonShineBuildCommand extends Command
     /** @var array<int, string> */
     protected array $reminderMenuInfo = [];
 
-    /** @var array<array-key, MoonShineBuildType> */
+    /** @var array<array-key, BuildType> */
     protected array $builders = [];
 
     /** @var array<string, string> */
@@ -82,9 +83,9 @@ class MoonShineBuildCommand extends Command
         );
 
         $validBuildMap = [
-            'withModel' => MoonShineBuildType::MODEL,
-            'withMigration' => MoonShineBuildType::MIGRATION,
-            'withResource' => MoonShineBuildType::RESOURCE,
+            'withModel' => BuildType::MODEL,
+            'withMigration' => BuildType::MIGRATION,
+            'withResource' => BuildType::RESOURCE,
         ];
 
         $validBuilders = [];
@@ -121,11 +122,11 @@ class MoonShineBuildCommand extends Command
             $this->info($this->projectFileName($filePath) . ' was created successfully!');
         }
 
-        if(! in_array(MoonShineBuildType::RESOURCE, $this->builders)) {
+        if(! in_array(BuildType::RESOURCE, $this->builders)) {
             return;
         }
 
-        $resourcePath = $codePath->path(MoonShineBuildType::RESOURCE->value);
+        $resourcePath = $codePath->path(BuildType::RESOURCE->value);
 
         $this->reminderResourceInfo[] = "{$resourcePath->rawName()}::class,";
         $this->reminderMenuInfo[] = StubBuilder::make($this->stubDir . 'MenuItem')
@@ -144,9 +145,9 @@ class MoonShineBuildCommand extends Command
     {
         $target = $this->argument('target');
 
-        $type = $this->getType($target);
+        $type = ParseType::from($this->getType($target));
 
-        if (is_null($target) && $type === 'json') {
+        if (is_null($target) && $type === ParseType::JSON) {
             $target = select(
                 'File',
                 collect(File::files(config('moonshine_builder.builds_dir')))->mapWithKeys(
@@ -157,8 +158,7 @@ class MoonShineBuildCommand extends Command
             );
         }
 
-        // If it is a sql table, the standard parent package generation is used
-        if($type === 'table') {
+        if($type === ParseType::TABLE) {
             $target = select(
                 'Table',
                 collect(Schema::getTables())
@@ -167,21 +167,10 @@ class MoonShineBuildCommand extends Command
                 default: 'jobs'
             );
 
-            $this->builders = array_filter($this->builders, fn ($item) => $item !== MoonShineBuildType::MIGRATION);
-
-            return [
-                StructureFromMysql::make(
-                    table: (string) $target,
-                    entity: $target,
-                    isBelongsTo: true,
-                    hasMany: [],
-                    hasOne: [],
-                    belongsToMany: []
-                ),
-            ];
+            $this->builders = array_filter($this->builders, fn ($item) => $item !== BuildType::MIGRATION);
         }
 
-        $codeStructures = (new MoonShineStructureFactory())->getStructures($target);
+        $codeStructures = (new MoonShineStructureFactory())->getStructures($type, $target);
 
         return $codeStructures->codeStructures();
     }
@@ -243,7 +232,7 @@ class MoonShineBuildCommand extends Command
     {
         if (! $this->option('type') && ! is_null($target)) {
             $availableTypes = [
-                'json',
+                ParseType::JSON->value,
             ];
 
             $fileSeparate = explode('.', $target);
@@ -254,7 +243,7 @@ class MoonShineBuildCommand extends Command
             }
         }
 
-        return $this->option('type') ?? select('Type', ['json', 'table']);
+        return $this->option('type') ?? select('Type', ParseType::cases());
     }
 
     protected function codePath(): CodePathContract
@@ -267,7 +256,7 @@ class MoonShineBuildCommand extends Command
 
     protected function resourceInfo(): void
     {
-        if(! in_array(MoonShineBuildType::RESOURCE, $this->builders)) {
+        if(! in_array(BuildType::RESOURCE, $this->builders)) {
             return;
         }
 
@@ -306,9 +295,9 @@ class MoonShineBuildCommand extends Command
     protected function prepareBuilders(): void
     {
         $this->builders = [
-            MoonShineBuildType::MODEL,
-            MoonShineBuildType::RESOURCE,
-            MoonShineBuildType::MIGRATION,
+            BuildType::MODEL,
+            BuildType::RESOURCE,
+            BuildType::MIGRATION,
         ];
     }
 }

@@ -2,12 +2,9 @@
 
 declare(strict_types=1);
 
-namespace DevLnk\MoonShineBuilder\Structures;
+namespace DevLnk\MoonShineBuilder\Services\CodeStructure;
 
 use DevLnk\MoonShineBuilder\Enums\SqlTypeMap;
-use DevLnk\MoonShineBuilder\Services\CodeStructure\CodeStructure;
-use DevLnk\MoonShineBuilder\Services\CodeStructure\ColumnStructure;
-use DevLnk\MoonShineBuilder\Services\CodeStructure\RelationStructure;
 
 final class CodeStructureList
 {

@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace DevLnk\MoonShineBuilder\Structures\Factories;
+namespace DevLnk\MoonShineBuilder\Services\CodeStructure\Factories;
 
 use DevLnk\MoonShineBuilder\Exceptions\ProjectBuilderException;
-use DevLnk\MoonShineBuilder\Structures\CodeStructureList;
+use DevLnk\MoonShineBuilder\Services\CodeStructure\CodeStructureList;
 
 final readonly class StructureFromJson implements MakeStructureContract
 {
