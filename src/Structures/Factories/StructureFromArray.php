@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace DevLnk\MoonShineBuilder\Structures\Factories;
 
-use DevLnk\LaravelCodeBuilder\Enums\SqlTypeMap;
-use DevLnk\LaravelCodeBuilder\Services\CodeStructure\CodeStructure;
-use DevLnk\LaravelCodeBuilder\Services\CodeStructure\ColumnStructure;
-use DevLnk\LaravelCodeBuilder\Services\CodeStructure\RelationStructure;
+use DevLnk\MoonShineBuilder\Enums\SqlTypeMap;
+use DevLnk\MoonShineBuilder\Services\CodeStructure\CodeStructure;
+use DevLnk\MoonShineBuilder\Services\CodeStructure\ColumnStructure;
+use DevLnk\MoonShineBuilder\Services\CodeStructure\RelationStructure;
 use DevLnk\MoonShineBuilder\Structures\CodeStructureList;
 
 final readonly class StructureFromArray implements MakeStructureContract

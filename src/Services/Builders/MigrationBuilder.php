@@ -4,10 +4,9 @@ declare(strict_types=1);
 
 namespace DevLnk\MoonShineBuilder\Services\Builders;
 
-use DevLnk\LaravelCodeBuilder\Enums\SqlTypeMap;
-use DevLnk\LaravelCodeBuilder\Services\Builders\AbstractBuilder;
-use DevLnk\LaravelCodeBuilder\Services\CodeStructure\ColumnStructure;
-use DevLnk\LaravelCodeBuilder\Services\StubBuilder;
+use DevLnk\MoonShineBuilder\Enums\SqlTypeMap;
+use DevLnk\MoonShineBuilder\Services\CodeStructure\ColumnStructure;
+use DevLnk\MoonShineBuilder\Services\StubBuilder;
 use DevLnk\MoonShineBuilder\Enums\MoonShineBuildType;
 use DevLnk\MoonShineBuilder\Services\Builders\Contracts\MigrationBuilderContract;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;

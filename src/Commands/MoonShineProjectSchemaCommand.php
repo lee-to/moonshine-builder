@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace DevLnk\MoonShineBuilder\Commands;
 
-use DevLnk\LaravelCodeBuilder\Services\CodeStructure\Factories\CodeStructureFromMysql;
 use DevLnk\MoonShineBuilder\Structures\CodeStructureList;
+use DevLnk\MoonShineBuilder\Structures\Factories\StructureFromMysql;
 use Illuminate\Console\Command;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Facades\Schema;
@@ -63,7 +63,7 @@ class MoonShineProjectSchemaCommand extends Command
         foreach ($tables as $table) {
             $entity = str($table)->singular()->camel()->ucfirst()->value();
 
-            $codeStructures->addCodeStructure(CodeStructureFromMysql::make(
+            $codeStructures->addCodeStructure(StructureFromMysql::make(
                 table: (string) $table,
                 entity: $entity,
                 isBelongsTo: true,

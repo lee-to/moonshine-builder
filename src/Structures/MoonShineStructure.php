@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace DevLnk\MoonShineBuilder\Structures;
 
-use DevLnk\LaravelCodeBuilder\Enums\SqlTypeMap;
-use DevLnk\LaravelCodeBuilder\Services\CodeStructure\CodeStructure;
-use DevLnk\LaravelCodeBuilder\Services\CodeStructure\ColumnStructure;
+use DevLnk\MoonShineBuilder\Enums\SqlTypeMap;
+use DevLnk\MoonShineBuilder\Services\CodeStructure\CodeStructure;
+use DevLnk\MoonShineBuilder\Services\CodeStructure\ColumnStructure;
 use DevLnk\MoonShineBuilder\Exceptions\ProjectBuilderException;
 use DevLnk\MoonShineBuilder\Support\TypeMap;
 

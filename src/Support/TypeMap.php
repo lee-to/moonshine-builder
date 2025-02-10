@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace DevLnk\MoonShineBuilder\Support;
 
-use DevLnk\LaravelCodeBuilder\Enums\SqlTypeMap;
+use DevLnk\MoonShineBuilder\Enums\SqlTypeMap;
 use DevLnk\MoonShineBuilder\Exceptions\ProjectBuilderException;
 use Illuminate\Support\Facades\File;
 

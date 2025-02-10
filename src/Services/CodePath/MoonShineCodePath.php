@@ -5,14 +5,11 @@ declare(strict_types=1);
 namespace DevLnk\MoonShineBuilder\Services\CodePath;
 
 use Carbon\Carbon;
-use DevLnk\LaravelCodeBuilder\Exceptions\NotFoundCodePathException;
-use DevLnk\LaravelCodeBuilder\Services\CodePath\AbstractPathItem;
-use DevLnk\LaravelCodeBuilder\Services\CodePath\CodePathContract;
-use DevLnk\LaravelCodeBuilder\Services\CodePath\CodePathItemContract;
-use DevLnk\LaravelCodeBuilder\Services\CodeStructure\CodeStructure;
+use DevLnk\MoonShineBuilder\Exceptions\NotFoundCodePathException;
 use DevLnk\MoonShineBuilder\Services\CodePath\MoonShine\MigrationPath;
 use DevLnk\MoonShineBuilder\Services\CodePath\MoonShine\ModelPath;
 use DevLnk\MoonShineBuilder\Services\CodePath\MoonShine\ResourcePath;
+use DevLnk\MoonShineBuilder\Services\CodeStructure\CodeStructure;
 
 class MoonShineCodePath implements CodePathContract
 {

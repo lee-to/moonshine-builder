@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace DevLnk\MoonShineBuilder\Enums;
 
-use DevLnk\LaravelCodeBuilder\Enums\BuildTypeContract;
-
 enum MoonShineBuildType: string implements BuildTypeContract
 {
     case MODEL = 'model';

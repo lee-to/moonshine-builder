@@ -4,42 +4,46 @@ declare(strict_types=1);
 
 namespace DevLnk\MoonShineBuilder\Commands;
 
-use DevLnk\LaravelCodeBuilder\Commands\LaravelCodeBuildCommand;
-use DevLnk\LaravelCodeBuilder\Enums\BuildTypeContract;
-use DevLnk\LaravelCodeBuilder\Exceptions\CodeGenerateCommandException;
-use DevLnk\LaravelCodeBuilder\Services\CodePath\CodePathContract;
-use DevLnk\LaravelCodeBuilder\Services\CodeStructure\CodeStructure;
-use DevLnk\LaravelCodeBuilder\Services\CodeStructure\Factories\CodeStructureFromMysql;
-use DevLnk\LaravelCodeBuilder\Services\StubBuilder;
+use DevLnk\MoonShineBuilder\Enums\BuildTypeContract;
 use DevLnk\MoonShineBuilder\Enums\MoonShineBuildType;
+use DevLnk\MoonShineBuilder\Exceptions\CodeGenerateCommandException;
 use DevLnk\MoonShineBuilder\Exceptions\ProjectBuilderException;
+use DevLnk\MoonShineBuilder\Services\Builders\Factory\AbstractBuildFactory;
+use DevLnk\MoonShineBuilder\Services\Builders\Factory\MoonShineBuildFactory;
+use DevLnk\MoonShineBuilder\Services\CodePath\CodePathContract;
 use DevLnk\MoonShineBuilder\Services\CodePath\MoonShineCodePath;
+use DevLnk\MoonShineBuilder\Services\CodeStructure\CodeStructure;
+use DevLnk\MoonShineBuilder\Services\StubBuilder;
+use DevLnk\MoonShineBuilder\Structures\Factories\StructureFromMysql;
 use DevLnk\MoonShineBuilder\Structures\Factories\MoonShineStructureFactory;
-use DevLnk\MoonShineBuilder\Traits\CommandVariables;
+use Illuminate\Console\Command;
+use Illuminate\Contracts\Filesystem\FileNotFoundException;
+use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Schema;
+use SplFileInfo;
 
 use function Laravel\Prompts\{confirm, note, select};
 
-use SplFileInfo;
-
-class MoonShineBuildCommand extends LaravelCodeBuildCommand
+class MoonShineBuildCommand extends Command
 {
-    use CommandVariables;
-
     protected $signature = 'moonshine:build {target?} {--type=}';
 
     protected int $iterations = 0;
 
-    /**
-     * @var array<int, string>
-     */
+    protected ?string $stubDir = '';
+
+    /** @var array<int, string> */
     protected array $reminderResourceInfo = [];
 
-    /**
-     * @var array<int, string>
-     */
+    /** @var array<int, string> */
     protected array $reminderMenuInfo = [];
+
+    /** @var array<array-key, MoonShineBuildType> */
+    protected array $builders = [];
+
+    /** @var array<string, string> */
+    protected array $replaceCautions = [];
 
     /**
      * @throws CodeGenerateCommandException
@@ -66,6 +70,10 @@ class MoonShineBuildCommand extends LaravelCodeBuildCommand
         return self::SUCCESS;
     }
 
+    /**
+     * @throws CodeGenerateCommandException
+     * @throws FileNotFoundException
+     */
     protected function buildCode(CodeStructure $codeStructure, CodePathContract $codePath): void
     {
         $buildFactory = $this->buildFactory(
@@ -92,7 +100,7 @@ class MoonShineBuildCommand extends LaravelCodeBuildCommand
 
         foreach ($this->builders as $builder) {
             if(! $builder instanceof BuildTypeContract) {
-                throw new CodeGenerateCommandException('builder is not DevLnk\LaravelCodeBuilder\Enums\BuildTypeContract');
+                throw new CodeGenerateCommandException('builder is not BuildTypeContract');
             }
 
             if(! in_array($builder, $validBuilders)) {
@@ -162,7 +170,7 @@ class MoonShineBuildCommand extends LaravelCodeBuildCommand
             $this->builders = array_filter($this->builders, fn ($item) => $item !== MoonShineBuildType::MIGRATION);
 
             return [
-                CodeStructureFromMysql::make(
+                StructureFromMysql::make(
                     table: (string) $target,
                     entity: $target,
                     isBelongsTo: true,
@@ -176,6 +184,59 @@ class MoonShineBuildCommand extends LaravelCodeBuildCommand
         $codeStructures = (new MoonShineStructureFactory())->getStructures($target);
 
         return $codeStructures->codeStructures();
+    }
+
+    /**
+     * @throws CodeGenerateCommandException
+     */
+    protected function make(CodeStructure $codeStructure, string $generationPath): void
+    {
+        $codeStructure->setStubDir($this->stubDir);
+
+        $codePath = $this->codePath();
+
+        $this->prepareGeneration($generationPath, $codeStructure, $codePath);
+
+        $this->buildCode($codeStructure, $codePath);
+    }
+
+    protected function prepareGeneration(string $generationPath, CodeStructure $codeStructure, CodePathContract $codePath): void
+    {
+        $isGenerationDir = $generationPath !== '_default';
+
+        $fileSystem = new Filesystem();
+
+        if($isGenerationDir) {
+            $genPath = base_path($generationPath);
+            if(! $fileSystem->isDirectory($genPath)) {
+                $fileSystem->makeDirectory($genPath, recursive: true);
+                $fileSystem->put($genPath . '/.gitignore', "*\n!.gitignore");
+            }
+        }
+
+        $codePath->initPaths($codeStructure, $generationPath, $isGenerationDir);
+
+        if(! $isGenerationDir) {
+            foreach ($this->builders as $buildType) {
+                if($fileSystem->isFile($codePath->path($buildType->value())->file())) {
+                    $this->replaceCautions[$buildType->value()] =
+                        $this->projectFileName($codePath->path($buildType->value())->file()) . " already exists, are you sure you want to replace it?";
+                }
+            }
+        }
+    }
+
+    protected function projectFileName(string $filePath): string
+    {
+        if(str_contains($filePath, '/resources/views')) {
+            return substr($filePath, strpos($filePath, '/resources/views') + 1);
+        }
+
+        if(str_contains($filePath, '/routes')) {
+            return substr($filePath, strpos($filePath, '/routes') + 1);
+        }
+
+        return substr($filePath, strpos($filePath, '/app') + 1);
     }
 
     protected function getType(?string $target): string
@@ -220,5 +281,34 @@ class MoonShineBuildCommand extends LaravelCodeBuildCommand
 
         $code = implode(PHP_EOL, $this->reminderMenuInfo);
         note($code);
+    }
+
+    protected function buildFactory(
+        CodeStructure $codeStructure,
+        CodePathContract $codePath
+    ): AbstractBuildFactory {
+        return new MoonShineBuildFactory(
+            $codeStructure,
+            $codePath
+        );
+    }
+
+    public function generationPath(): string
+    {
+        return '_default';
+    }
+
+    protected function setStubDir(): void
+    {
+        $this->stubDir = __DIR__ . '/../../stubs/';
+    }
+
+    protected function prepareBuilders(): void
+    {
+        $this->builders = [
+            MoonShineBuildType::MODEL,
+            MoonShineBuildType::RESOURCE,
+            MoonShineBuildType::MIGRATION,
+        ];
     }
 }
