@@ -9,4 +9,6 @@ enum ParseType: string
     case TABLE = 'table';
 
     case JSON = 'json';
+
+    case CONSOLE = 'console';
 }
