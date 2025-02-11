@@ -170,7 +170,7 @@ class MoonShineBuildCommand extends Command
 
         $codeStructures = (new MoonShineStructureFactory())->getStructures($this->parseType, $target);
 
-        return $codeStructures->codeStructures();
+        return $codeStructures->makeStructures()->codeStructures();
     }
 
     /**
@@ -243,9 +243,10 @@ class MoonShineBuildCommand extends Command
             }
         }
 
-        return $this->option('type') ?? select('Type', array_map(static function (ParseType $item) {
-            return $item->value;
-        }, ParseType::cases()));
+        return $this->option('type') ?? select(
+            'Type',
+            array_map(static fn (ParseType $item) => $item->value, ParseType::cases())
+        );
     }
 
     protected function codePath(): CodePathContract

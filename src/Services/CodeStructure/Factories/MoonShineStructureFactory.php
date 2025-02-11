@@ -13,11 +13,11 @@ final class MoonShineStructureFactory
     /**
      * @throws ProjectBuilderException
      */
-    public function getStructures(ParseType $type, string $target): CodeStructureList
+    public function getStructures(ParseType $type, string $target): MakeStructureContract
     {
         return match ($type) {
             ParseType::TABLE => StructureFromMysql::make(table: $target, entity: $target,isBelongsTo: true),
-            ParseType::JSON => StructureFromJson::make($this->getPath($target))->makeStructures(),
+            ParseType::JSON => StructureFromJson::make($this->getPath($target)),
             default => throw new ProjectBuilderException('Parse type not found')
         };
     }
