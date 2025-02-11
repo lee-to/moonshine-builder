@@ -6,6 +6,7 @@ namespace DevLnk\MoonShineBuilder\Providers;
 
 use DevLnk\MoonShineBuilder\Commands\MoonShineBuildCommand;
 use DevLnk\MoonShineBuilder\Commands\MoonShineProjectSchemaCommand;
+use DevLnk\MoonShineBuilder\Commands\ResourceBuildCommand;
 use DevLnk\MoonShineBuilder\Services\Builders\Contracts\MigrationBuilderContract;
 use DevLnk\MoonShineBuilder\Services\Builders\Contracts\ModelBuilderContract;
 use DevLnk\MoonShineBuilder\Services\Builders\Contracts\ResourceBuilderContract;
@@ -19,6 +20,7 @@ class MoonShineBuilderProvider extends ServiceProvider
     protected array $commands = [
         MoonShineBuildCommand::class,
         MoonShineProjectSchemaCommand::class,
+        ResourceBuildCommand::class,
     ];
 
     public function register(): void

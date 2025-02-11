@@ -45,6 +45,7 @@ class MoonShineBuildCommand extends Command
     /** @var array<string, string> */
     protected array $replaceCautions = [];
 
+    protected ParseType $parseType;
     /**
      * @throws CodeGenerateCommandException
      * @throws FileNotFoundException
@@ -53,6 +54,15 @@ class MoonShineBuildCommand extends Command
      */
     public function handle(): int
     {
+        $target = $this->argument('target');
+
+        $this->parseType = ParseType::from($this->getType($target));
+
+        if($this->parseType === ParseType::CONSOLE) {
+            $this->call('moonshine:build-resource');
+            return self::SUCCESS;
+        }
+
         $this->setStubDir();
 
         $this->prepareBuilders();
@@ -135,9 +145,7 @@ class MoonShineBuildCommand extends Command
     {
         $target = $this->argument('target');
 
-        $type = ParseType::from($this->getType($target));
-
-        if (is_null($target) && $type === ParseType::JSON) {
+        if (is_null($target) && $this->parseType === ParseType::JSON) {
             $target = select(
                 'File',
                 collect(File::files(config('moonshine_builder.builds_dir')))->mapWithKeys(
@@ -148,7 +156,7 @@ class MoonShineBuildCommand extends Command
             );
         }
 
-        if($type === ParseType::TABLE) {
+        if($this->parseType === ParseType::TABLE) {
             $target = select(
                 'Table',
                 collect(Schema::getTables())
@@ -160,7 +168,7 @@ class MoonShineBuildCommand extends Command
             $this->builders = array_filter($this->builders, fn ($item) => $item !== BuildType::MIGRATION);
         }
 
-        $codeStructures = (new MoonShineStructureFactory())->getStructures($type, $target);
+        $codeStructures = (new MoonShineStructureFactory())->getStructures($this->parseType, $target);
 
         return $codeStructures->codeStructures();
     }
@@ -235,7 +243,9 @@ class MoonShineBuildCommand extends Command
             }
         }
 
-        return $this->option('type') ?? select('Type', ParseType::cases());
+        return $this->option('type') ?? select('Type', array_map(static function (ParseType $item) {
+            return $item->value;
+        }, ParseType::cases()));
     }
 
     protected function codePath(): CodePathContract
