@@ -18,6 +18,7 @@ final class MoonShineStructureFactory
         return match ($type) {
             ParseType::TABLE => StructureFromMysql::make(table: $target, entity: $target,isBelongsTo: true),
             ParseType::JSON => StructureFromJson::make($this->getPath($target)),
+            ParseType::OPENAPI => StructureFromOpenapi::make($this->getPath($target)),
             default => throw new ProjectBuilderException('Parse type not found')
         };
     }

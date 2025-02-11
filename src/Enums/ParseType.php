@@ -11,4 +11,6 @@ enum ParseType: string
     case JSON = 'json';
 
     case CONSOLE = 'console';
+    
+    case OPENAPI = 'openapi';
 }

@@ -145,7 +145,12 @@ class MoonShineBuildCommand extends Command
     {
         $target = $this->argument('target');
 
-        if (is_null($target) && $this->parseType === ParseType::JSON) {
+        if (is_null($target) 
+            &&  (
+                $this->parseType === ParseType::JSON
+                || $this->parseType === ParseType::OPENAPI
+            )
+        ) {
             $target = select(
                 'File',
                 collect(File::files(config('moonshine_builder.builds_dir')))->mapWithKeys(
