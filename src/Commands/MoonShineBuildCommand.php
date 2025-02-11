@@ -4,45 +4,51 @@ declare(strict_types=1);
 
 namespace DevLnk\MoonShineBuilder\Commands;
 
-use DevLnk\LaravelCodeBuilder\Commands\LaravelCodeBuildCommand;
-use DevLnk\LaravelCodeBuilder\Enums\BuildTypeContract;
-use DevLnk\LaravelCodeBuilder\Exceptions\CodeGenerateCommandException;
-use DevLnk\LaravelCodeBuilder\Services\CodePath\CodePathContract;
-use DevLnk\LaravelCodeBuilder\Services\CodeStructure\CodeStructure;
-use DevLnk\LaravelCodeBuilder\Services\CodeStructure\Factories\CodeStructureFromMysql;
-use DevLnk\LaravelCodeBuilder\Services\StubBuilder;
-use DevLnk\MoonShineBuilder\Enums\MoonShineBuildType;
+use DevLnk\MoonShineBuilder\Enums\BuildTypeContract;
+use DevLnk\MoonShineBuilder\Enums\ParseType;
+use DevLnk\MoonShineBuilder\Enums\BuildType;
+use DevLnk\MoonShineBuilder\Exceptions\CodeGenerateCommandException;
+use DevLnk\MoonShineBuilder\Exceptions\NotFoundBuilderException;
 use DevLnk\MoonShineBuilder\Exceptions\ProjectBuilderException;
+use DevLnk\MoonShineBuilder\Services\Builders\Factory\MoonShineBuildFactory;
+use DevLnk\MoonShineBuilder\Services\CodePath\CodePathContract;
 use DevLnk\MoonShineBuilder\Services\CodePath\MoonShineCodePath;
-use DevLnk\MoonShineBuilder\Structures\Factories\MoonShineStructureFactory;
-use DevLnk\MoonShineBuilder\Traits\CommandVariables;
+use DevLnk\MoonShineBuilder\Services\CodeStructure\CodeStructure;
+use DevLnk\MoonShineBuilder\Services\CodeStructure\Factories\MoonShineStructureFactory;
+use DevLnk\MoonShineBuilder\Services\StubBuilder;
+use Illuminate\Console\Command;
+use Illuminate\Contracts\Filesystem\FileNotFoundException;
+use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Schema;
+use SplFileInfo;
 
 use function Laravel\Prompts\{confirm, note, select};
 
-use SplFileInfo;
-
-class MoonShineBuildCommand extends LaravelCodeBuildCommand
+class MoonShineBuildCommand extends Command
 {
-    use CommandVariables;
-
     protected $signature = 'moonshine:build {target?} {--type=}';
 
     protected int $iterations = 0;
 
-    /**
-     * @var array<int, string>
-     */
+    protected ?string $stubDir = '';
+
+    /** @var array<int, string> */
     protected array $reminderResourceInfo = [];
 
-    /**
-     * @var array<int, string>
-     */
+    /** @var array<int, string> */
     protected array $reminderMenuInfo = [];
+
+    /** @var array<array-key, BuildType> */
+    protected array $builders = [];
+
+    /** @var array<string, string> */
+    protected array $replaceCautions = [];
 
     /**
      * @throws CodeGenerateCommandException
+     * @throws FileNotFoundException
+     * @throws NotFoundBuilderException
      * @throws ProjectBuilderException
      */
     public function handle(): int
@@ -66,33 +72,27 @@ class MoonShineBuildCommand extends LaravelCodeBuildCommand
         return self::SUCCESS;
     }
 
+    /**
+     * @throws CodeGenerateCommandException
+     * @throws FileNotFoundException
+     * @throws NotFoundBuilderException
+     */
     protected function buildCode(CodeStructure $codeStructure, CodePathContract $codePath): void
     {
-        $buildFactory = $this->buildFactory(
+        $buildFactory = new MoonShineBuildFactory(
             $codeStructure,
-            $codePath,
+            $codePath
         );
 
-        $validBuildMap = [
-            'withModel' => MoonShineBuildType::MODEL,
-            'withMigration' => MoonShineBuildType::MIGRATION,
-            'withResource' => MoonShineBuildType::RESOURCE,
-        ];
-
-        $validBuilders = [];
-        foreach ($validBuildMap as $dataKey => $builder) {
-            if(
-                ! is_null($codeStructure->dataValue($dataKey))
-                && $codeStructure->dataValue($dataKey) === false
-            ) {
-                continue;
-            }
-            $validBuilders[] = $builder;
-        }
+        $validBuilders = array_filter([
+            $codeStructure->withModel() ? BuildType::MODEL : null,
+            $codeStructure->withMigration() ? BuildType::MIGRATION : null, 
+            $codeStructure->withResource() ? BuildType::RESOURCE : null
+        ]);
 
         foreach ($this->builders as $builder) {
             if(! $builder instanceof BuildTypeContract) {
-                throw new CodeGenerateCommandException('builder is not DevLnk\LaravelCodeBuilder\Enums\BuildTypeContract');
+                throw new CodeGenerateCommandException('builder is not BuildTypeContract');
             }
 
             if(! in_array($builder, $validBuilders)) {
@@ -113,11 +113,11 @@ class MoonShineBuildCommand extends LaravelCodeBuildCommand
             $this->info($this->projectFileName($filePath) . ' was created successfully!');
         }
 
-        if(! in_array(MoonShineBuildType::RESOURCE, $this->builders)) {
+        if(! in_array(BuildType::RESOURCE, $this->builders)) {
             return;
         }
 
-        $resourcePath = $codePath->path(MoonShineBuildType::RESOURCE->value);
+        $resourcePath = $codePath->path(BuildType::RESOURCE->value);
 
         $this->reminderResourceInfo[] = "{$resourcePath->rawName()}::class,";
         $this->reminderMenuInfo[] = StubBuilder::make($this->stubDir . 'MenuItem')
@@ -129,16 +129,15 @@ class MoonShineBuildCommand extends LaravelCodeBuildCommand
 
     /**
      * @return array<int, CodeStructure>
-     *
      * @throws ProjectBuilderException
      */
     protected function codeStructures(): array
     {
         $target = $this->argument('target');
 
-        $type = $this->getType($target);
+        $type = ParseType::from($this->getType($target));
 
-        if (is_null($target) && $type === 'json') {
+        if (is_null($target) && $type === ParseType::JSON) {
             $target = select(
                 'File',
                 collect(File::files(config('moonshine_builder.builds_dir')))->mapWithKeys(
@@ -149,8 +148,7 @@ class MoonShineBuildCommand extends LaravelCodeBuildCommand
             );
         }
 
-        // If it is a sql table, the standard parent package generation is used
-        if($type === 'table') {
+        if($type === ParseType::TABLE) {
             $target = select(
                 'Table',
                 collect(Schema::getTables())
@@ -159,30 +157,74 @@ class MoonShineBuildCommand extends LaravelCodeBuildCommand
                 default: 'jobs'
             );
 
-            $this->builders = array_filter($this->builders, fn ($item) => $item !== MoonShineBuildType::MIGRATION);
-
-            return [
-                CodeStructureFromMysql::make(
-                    table: (string) $target,
-                    entity: $target,
-                    isBelongsTo: true,
-                    hasMany: [],
-                    hasOne: [],
-                    belongsToMany: []
-                ),
-            ];
+            $this->builders = array_filter($this->builders, fn ($item) => $item !== BuildType::MIGRATION);
         }
 
-        $codeStructures = (new MoonShineStructureFactory())->getStructures($target);
+        $codeStructures = (new MoonShineStructureFactory())->getStructures($type, $target);
 
         return $codeStructures->codeStructures();
+    }
+
+    /**
+     * @throws CodeGenerateCommandException
+     * @throws FileNotFoundException
+     * @throws NotFoundBuilderException
+     */
+    protected function make(CodeStructure $codeStructure, string $generationPath): void
+    {
+        $codeStructure->setStubDir($this->stubDir);
+
+        $codePath = $this->codePath();
+
+        $this->prepareGeneration($generationPath, $codeStructure, $codePath);
+
+        $this->buildCode($codeStructure, $codePath);
+    }
+
+    protected function prepareGeneration(string $generationPath, CodeStructure $codeStructure, CodePathContract $codePath): void
+    {
+        $isGenerationDir = $generationPath !== '_default';
+
+        $fileSystem = new Filesystem();
+
+        if($isGenerationDir) {
+            $genPath = base_path($generationPath);
+            if(! $fileSystem->isDirectory($genPath)) {
+                $fileSystem->makeDirectory($genPath, recursive: true);
+                $fileSystem->put($genPath . '/.gitignore', "*\n!.gitignore");
+            }
+        }
+
+        $codePath->initPaths($codeStructure, $generationPath, $isGenerationDir);
+
+        if(! $isGenerationDir) {
+            foreach ($this->builders as $buildType) {
+                if($fileSystem->isFile($codePath->path($buildType->value())->file())) {
+                    $this->replaceCautions[$buildType->value()] =
+                        $this->projectFileName($codePath->path($buildType->value())->file()) . " already exists, are you sure you want to replace it?";
+                }
+            }
+        }
+    }
+
+    protected function projectFileName(string $filePath): string
+    {
+        if(str_contains($filePath, '/resources/views')) {
+            return substr($filePath, strpos($filePath, '/resources/views') + 1);
+        }
+
+        if(str_contains($filePath, '/routes')) {
+            return substr($filePath, strpos($filePath, '/routes') + 1);
+        }
+
+        return substr($filePath, strpos($filePath, '/app') + 1);
     }
 
     protected function getType(?string $target): string
     {
         if (! $this->option('type') && ! is_null($target)) {
             $availableTypes = [
-                'json',
+                ParseType::JSON->value,
             ];
 
             $fileSeparate = explode('.', $target);
@@ -193,7 +235,7 @@ class MoonShineBuildCommand extends LaravelCodeBuildCommand
             }
         }
 
-        return $this->option('type') ?? select('Type', ['json', 'table']);
+        return $this->option('type') ?? select('Type', ParseType::cases());
     }
 
     protected function codePath(): CodePathContract
@@ -206,7 +248,7 @@ class MoonShineBuildCommand extends LaravelCodeBuildCommand
 
     protected function resourceInfo(): void
     {
-        if(! in_array(MoonShineBuildType::RESOURCE, $this->builders)) {
+        if(! in_array(BuildType::RESOURCE, $this->builders)) {
             return;
         }
 
@@ -220,5 +262,24 @@ class MoonShineBuildCommand extends LaravelCodeBuildCommand
 
         $code = implode(PHP_EOL, $this->reminderMenuInfo);
         note($code);
+    }
+
+    public function generationPath(): string
+    {
+        return '_default';
+    }
+
+    protected function setStubDir(): void
+    {
+        $this->stubDir = __DIR__ . '/../../stubs/';
+    }
+
+    protected function prepareBuilders(): void
+    {
+        $this->builders = [
+            BuildType::MODEL,
+            BuildType::RESOURCE,
+            BuildType::MIGRATION,
+        ];
     }
 }

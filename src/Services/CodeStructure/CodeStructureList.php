@@ -2,12 +2,9 @@
 
 declare(strict_types=1);
 
-namespace DevLnk\MoonShineBuilder\Structures;
+namespace DevLnk\MoonShineBuilder\Services\CodeStructure;
 
-use DevLnk\LaravelCodeBuilder\Enums\SqlTypeMap;
-use DevLnk\LaravelCodeBuilder\Services\CodeStructure\CodeStructure;
-use DevLnk\LaravelCodeBuilder\Services\CodeStructure\ColumnStructure;
-use DevLnk\LaravelCodeBuilder\Services\CodeStructure\RelationStructure;
+use DevLnk\MoonShineBuilder\Enums\SqlTypeMap;
 
 final class CodeStructureList
 {
@@ -112,7 +109,7 @@ final class CodeStructureList
                 ];
 
                 if(in_array($column->column(), $resourceColumnProperties)) {
-                    $codeStructure->setDataValue('column', $column->column());
+                    $codeStructure->setColumnName($column->column());
                 }
 
                 if($column->relation()) {
@@ -134,7 +131,7 @@ final class CodeStructureList
                 'name' => $codeStructure->entity()->ucFirst(),
                 'timestamps' => $codeStructure->isTimestamps(),
                 'soft_deletes' => $codeStructure->isSoftDeletes(),
-                'column' => $codeStructure->dataValue('column'),
+                'column' => $codeStructure->getColumnName(),
                 'withModel' => false,
                 'withMigration' => false,
                 'fields' => $fields,

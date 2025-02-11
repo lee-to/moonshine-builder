@@ -7,10 +7,10 @@ namespace DevLnk\MoonShineBuilder\Providers;
 use DevLnk\MoonShineBuilder\Commands\MoonShineBuildCommand;
 use DevLnk\MoonShineBuilder\Commands\MoonShineProjectSchemaCommand;
 use DevLnk\MoonShineBuilder\Services\Builders\Contracts\MigrationBuilderContract;
-use DevLnk\MoonShineBuilder\Services\Builders\Contracts\MoonShineModelBuilderContract;
+use DevLnk\MoonShineBuilder\Services\Builders\Contracts\ModelBuilderContract;
 use DevLnk\MoonShineBuilder\Services\Builders\Contracts\ResourceBuilderContract;
 use DevLnk\MoonShineBuilder\Services\Builders\MigrationBuilder;
-use DevLnk\MoonShineBuilder\Services\Builders\MoonShineModelBuilder;
+use DevLnk\MoonShineBuilder\Services\Builders\ModelBuilder;
 use DevLnk\MoonShineBuilder\Services\Builders\ResourceBuilder;
 use Illuminate\Support\ServiceProvider;
 
@@ -23,7 +23,7 @@ class MoonShineBuilderProvider extends ServiceProvider
 
     public function register(): void
     {
-        $this->app->bind(MoonShineModelBuilderContract::class, MoonShineModelBuilder::class);
+        $this->app->bind(ModelBuilderContract::class, ModelBuilder::class);
         $this->app->bind(ResourceBuilderContract::class, ResourceBuilder::class);
         $this->app->bind(MigrationBuilderContract::class, MigrationBuilder::class);
     }

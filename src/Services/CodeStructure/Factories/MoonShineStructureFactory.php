@@ -1,0 +1,35 @@
+<?php
+
+declare(strict_types=1);
+
+namespace DevLnk\MoonShineBuilder\Services\CodeStructure\Factories;
+
+use DevLnk\MoonShineBuilder\Enums\ParseType;
+use DevLnk\MoonShineBuilder\Exceptions\ProjectBuilderException;
+use DevLnk\MoonShineBuilder\Services\CodeStructure\CodeStructureList;
+
+final class MoonShineStructureFactory
+{
+    /**
+     * @throws ProjectBuilderException
+     */
+    public function getStructures(ParseType $type, string $target): CodeStructureList
+    {
+        return match ($type) {
+            ParseType::TABLE => StructureFromMysql::make(table: $target, entity: $target,isBelongsTo: true),
+            ParseType::JSON => StructureFromJson::make($this->getPath($target))->makeStructures()
+        };
+    }
+
+    /**
+     * @throws ProjectBuilderException
+     */
+    private function getPath(string $target): string
+    {
+        $result = config('moonshine_builder.builds_dir') . '/' . $target;
+        if(! file_exists($result)) {
+            throw new ProjectBuilderException("File $result not found");
+        }
+        return $result;
+    }
+}

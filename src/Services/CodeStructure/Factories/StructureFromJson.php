@@ -2,14 +2,10 @@
 
 declare(strict_types=1);
 
-namespace DevLnk\MoonShineBuilder\Structures\Factories;
+namespace DevLnk\MoonShineBuilder\Services\CodeStructure\Factories;
 
-use DevLnk\LaravelCodeBuilder\Enums\SqlTypeMap;
-use DevLnk\LaravelCodeBuilder\Services\CodeStructure\CodeStructure;
-use DevLnk\LaravelCodeBuilder\Services\CodeStructure\ColumnStructure;
-use DevLnk\LaravelCodeBuilder\Services\CodeStructure\RelationStructure;
 use DevLnk\MoonShineBuilder\Exceptions\ProjectBuilderException;
-use DevLnk\MoonShineBuilder\Structures\CodeStructureList;
+use DevLnk\MoonShineBuilder\Services\CodeStructure\CodeStructureList;
 
 final readonly class StructureFromJson implements MakeStructureContract
 {

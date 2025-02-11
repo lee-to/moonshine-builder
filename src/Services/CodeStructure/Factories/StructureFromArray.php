@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace DevLnk\MoonShineBuilder\Structures\Factories;
+namespace DevLnk\MoonShineBuilder\Services\CodeStructure\Factories;
 
-use DevLnk\LaravelCodeBuilder\Enums\SqlTypeMap;
-use DevLnk\LaravelCodeBuilder\Services\CodeStructure\CodeStructure;
-use DevLnk\LaravelCodeBuilder\Services\CodeStructure\ColumnStructure;
-use DevLnk\LaravelCodeBuilder\Services\CodeStructure\RelationStructure;
-use DevLnk\MoonShineBuilder\Structures\CodeStructureList;
+use DevLnk\MoonShineBuilder\Enums\SqlTypeMap;
+use DevLnk\MoonShineBuilder\Services\CodeStructure\CodeStructure;
+use DevLnk\MoonShineBuilder\Services\CodeStructure\CodeStructureList;
+use DevLnk\MoonShineBuilder\Services\CodeStructure\ColumnStructure;
+use DevLnk\MoonShineBuilder\Services\CodeStructure\RelationStructure;
 
 final readonly class StructureFromArray implements MakeStructureContract
 {
@@ -27,18 +27,18 @@ final readonly class StructureFromArray implements MakeStructureContract
             $codeStructure = new CodeStructure($table, $resource['name']);
 
             if(isset($resource['withModel'])) {
-                $codeStructure->setDataValue('withModel', $resource['withModel']);
+                $codeStructure->setWithModel($resource['withModel']);
             }
 
             if(isset($resource['withMigration'])) {
-                $codeStructure->setDataValue('withMigration', $resource['withMigration']);
+                $codeStructure->setWithMigration($resource['withMigration']);
             }
 
             if(isset($resource['withResource'])) {
-                $codeStructure->setDataValue('withResource', $resource['withResource']);
+                $codeStructure->setWithResource($resource['withResource']);
             }
 
-            $codeStructure->setDataValue('column', $resource['column'] ?? null);
+            $codeStructure->setColumnName($resource['column'] ?? null);
 
             foreach ($resource['fields'] as $field) {
 
@@ -67,7 +67,7 @@ final readonly class StructureFromArray implements MakeStructureContract
                     ));
 
                     if(! empty($field['relation']['relation_name'])) {
-                        $columnStructure->setDataValue('relation_name', $field['relation']['relation_name']);
+                        $columnStructure->setRelationName($field['relation']['relation_name']);
                     }
                 }
 
@@ -86,29 +86,29 @@ final readonly class StructureFromArray implements MakeStructureContract
                 }
 
                 if(! empty($field['methods'])) {
-                    $columnStructure->setDataValue('resource_methods', $field['methods']);
+                    $columnStructure->setResourceMethods($field['methods']);
                 }
 
                 if(! empty($field['migration'])) {
                     if(! empty($field['migration']['options'])) {
-                        $columnStructure->setDataValue('migration_options', $field['migration']['options']);
+                        $columnStructure->setMigrationOptions($field['migration']['options']);
                     }
 
                     if(! empty($field['migration']['methods'])) {
-                        $columnStructure->setDataValue('migration_methods', $field['migration']['methods']);
+                        $columnStructure->setMigrationMethods($field['migration']['methods']);
                     }
                 }
 
                 if(! empty($field['resource_class'])) {
-                    $columnStructure->setDataValue('resource_class', $field['resource_class']);
+                    $columnStructure->setResourceClass($field['resource_class']);
                 }
 
                 if(! empty($field['model_class'])) {
-                    $columnStructure->setDataValue('model_class', $field['model_class']);
+                    $columnStructure->setModelClass($field['model_class']);
                 }
 
                 if(! empty($field['field'])) {
-                    $columnStructure->setDataValue('field_class', $field['field']);
+                    $columnStructure->setFieldClass($field['field']);
                 }
 
                 $codeStructure->addColumn($columnStructure);

@@ -4,11 +4,10 @@ declare(strict_types=1);
 
 namespace DevLnk\MoonShineBuilder\Services\Builders;
 
-use DevLnk\LaravelCodeBuilder\Enums\SqlTypeMap;
-use DevLnk\LaravelCodeBuilder\Services\Builders\AbstractBuilder;
-use DevLnk\LaravelCodeBuilder\Services\CodeStructure\ColumnStructure;
-use DevLnk\LaravelCodeBuilder\Services\StubBuilder;
-use DevLnk\MoonShineBuilder\Enums\MoonShineBuildType;
+use DevLnk\MoonShineBuilder\Enums\SqlTypeMap;
+use DevLnk\MoonShineBuilder\Services\CodeStructure\ColumnStructure;
+use DevLnk\MoonShineBuilder\Services\StubBuilder;
+use DevLnk\MoonShineBuilder\Enums\BuildType;
 use DevLnk\MoonShineBuilder\Services\Builders\Contracts\MigrationBuilderContract;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
 
@@ -19,7 +18,7 @@ class MigrationBuilder extends AbstractBuilder implements MigrationBuilderContra
      */
     public function build(): void
     {
-        $migrationPath = $this->codePath->path(MoonShineBuildType::MIGRATION->value);
+        $migrationPath = $this->codePath->path(BuildType::MIGRATION->value);
 
         StubBuilder::make($this->stubFile)
             ->setKey(
@@ -87,8 +86,8 @@ class MigrationBuilder extends AbstractBuilder implements MigrationBuilderContra
                 fn ($str) => $str->append("('{$column->column()}'")
             )
             ->when(
-                ! is_null($column->dataValue('migration_options')),
-                fn ($str) => $str->append(', ' . implode(', ', $column->dataValue('migration_options')) . ')'),
+                $column->getMigrationOptions() !== [],
+                fn ($str) => $str->append(', ' . implode(', ', $column->getMigrationOptions()) . ')'),
                 fn ($str) => $str->append(")")
             )
             ->value()
@@ -103,19 +102,16 @@ class MigrationBuilder extends AbstractBuilder implements MigrationBuilderContra
 
         $modelName = str($column->relation()->table()->singular())->ucfirst()->value();
 
-        $modelClass = empty($column->dataValue('model_class')) ? '\\App\\Models\\' : $column->dataValue('model_class');
+        $modelClass = empty($column->getModelClass()) ? '\\App\\Models\\' : $column->getModelClass();
 
         return str('foreignIdFor')
             ->append('(')
             ->append($modelClass)
             ->when(
-                empty($column->dataValue('model_class')),
+                empty($column->getModelClass()),
                 fn ($str) => $str->append($modelName)
             )
             ->append("::class")
-//            ->when($this->foreignId,
-//                fn($str) => $str->append(", '{$this->foreignId}'")
-//            )
             ->append(')')
             ->newLine()
             ->append("\t\t\t\t")
@@ -132,16 +128,13 @@ class MigrationBuilder extends AbstractBuilder implements MigrationBuilderContra
 
     protected function migrationMethods(ColumnStructure $column): string
     {
-        if(
-            is_null($column->dataValue('migration_methods'))
-            || ! is_array($column->dataValue('migration_methods'))
-        ) {
+        if($column->getMigrationMethods() === []) {
             return '';
         }
 
         $result = "";
 
-        foreach ($column->dataValue('migration_methods') as $method) {
+        foreach ($column->getMigrationMethods() as $method) {
             if(! str_contains($method, '(')) {
                 $method .= "()";
             }

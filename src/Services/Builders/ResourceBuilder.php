@@ -4,13 +4,11 @@ declare(strict_types=1);
 
 namespace DevLnk\MoonShineBuilder\Services\Builders;
 
-use DevLnk\LaravelCodeBuilder\Enums\SqlTypeMap;
-use DevLnk\LaravelCodeBuilder\Services\Builders\AbstractBuilder;
-use DevLnk\LaravelCodeBuilder\Services\StubBuilder;
-use DevLnk\MoonShineBuilder\Enums\MoonShineBuildType;
+use DevLnk\MoonShineBuilder\Enums\BuildType;
 use DevLnk\MoonShineBuilder\Exceptions\ProjectBuilderException;
 use DevLnk\MoonShineBuilder\Services\Builders\Contracts\ResourceBuilderContract;
-use DevLnk\MoonShineBuilder\Structures\MoonShineStructure;
+use DevLnk\MoonShineBuilder\Services\CodeStructure\MoonShineStructure;
+use DevLnk\MoonShineBuilder\Services\StubBuilder;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
 
 class ResourceBuilder extends AbstractBuilder implements ResourceBuilderContract
@@ -25,10 +23,10 @@ class ResourceBuilder extends AbstractBuilder implements ResourceBuilderContract
     {
         $this->moonShineStructure = new MoonShineStructure($this->codeStructure);
 
-        $resourcePath = $this->codePath->path(MoonShineBuildType::RESOURCE->value);
-        $modelPath = $this->codePath->path(MoonShineBuildType::MODEL->value);
+        $resourcePath = $this->codePath->path(BuildType::RESOURCE->value);
+        $modelPath = $this->codePath->path(BuildType::MODEL->value);
 
-        $modelUse = class_exists($modelPath->namespace() . '\\' . $modelPath->rawName())
+        $modelUse = class_exists($modelPath->namespace() . '\\' . $modelPath->rawName(), false)
             ? "use {$modelPath->namespace()}\\{$modelPath->rawName()};"
             : "";
 
@@ -41,9 +39,9 @@ class ResourceBuilder extends AbstractBuilder implements ResourceBuilderContract
                 ->newLine()
                 ->newLine()
                 ->append("\t")
-                ->append("protected string \$column = '{$this->codeStructure->dataValue('column')}';")
+                ->append("protected string \$column = '{$this->codeStructure->getColumnName()}';")
                 ->value(),
-                ! is_null($this->codeStructure->dataValue('column'))
+                ! is_null($this->codeStructure->getColumnName())
             )
             ->setKey(
                 '{model_use}',

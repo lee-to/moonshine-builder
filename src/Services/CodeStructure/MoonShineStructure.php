@@ -2,11 +2,9 @@
 
 declare(strict_types=1);
 
-namespace DevLnk\MoonShineBuilder\Structures;
+namespace DevLnk\MoonShineBuilder\Services\CodeStructure;
 
-use DevLnk\LaravelCodeBuilder\Enums\SqlTypeMap;
-use DevLnk\LaravelCodeBuilder\Services\CodeStructure\CodeStructure;
-use DevLnk\LaravelCodeBuilder\Services\CodeStructure\ColumnStructure;
+use DevLnk\MoonShineBuilder\Enums\SqlTypeMap;
 use DevLnk\MoonShineBuilder\Exceptions\ProjectBuilderException;
 use DevLnk\MoonShineBuilder\Support\TypeMap;
 
@@ -33,8 +31,8 @@ final readonly class MoonShineStructure
                 continue;
             }
 
-            $fieldClass = $column->dataValue('field_class')
-                ? $this->fieldMap->fieldClassFromAlias($column->dataValue('field_class'))
+            $fieldClass = $column->getFieldClass()
+                ? $this->fieldMap->fieldClassFromAlias($column->getFieldClass())
                 : $this->fieldMap->getMoonShineFieldFromSqlType($column->type())
             ;
 
@@ -67,12 +65,10 @@ final readonly class MoonShineStructure
                 continue;
             }
 
-            $fieldClass = $column->dataValue('field_class')
-                ? $this->fieldMap->fieldClassFromAlias($column->dataValue('field_class'))
+            $fieldClass = $column->getFieldClass()
+                ? $this->fieldMap->fieldClassFromAlias($column->getFieldClass())
                 : $this->fieldMap->getMoonShineFieldFromSqlType($column->type())
             ;
-
-            //dump($fieldClass);
 
             if(! is_null($column->relation())) {
                 $resourceName = str($column->relation()->table()->camel())->singular()->ucfirst()->value();
@@ -87,8 +83,8 @@ final readonly class MoonShineStructure
                     ->append("('{$column->name()}', '$relationMethod'")
                     ->append(", resource: ")
                     ->when(
-                        $column->dataValue('resource_class'),
-                        fn ($str) => $str->append($column->dataValue('resource_class') . '::class'),
+                        $column->getResourceClass(),
+                        fn ($str) => $str->append($column->getResourceClass() . '::class'),
                         fn ($str) => $str->append(str($resourceName)->append('Resource')->append('::class')->value()),
                     )
                     ->append(')')
@@ -166,10 +162,7 @@ final readonly class MoonShineStructure
 
     private function resourceMethods(ColumnStructure $columnStructure, int $tabulation = 0): string
     {
-        if(
-            empty($columnStructure->dataValue('resource_methods'))
-            || ! is_array($columnStructure->dataValue('resource_methods'))
-        ) {
+        if($columnStructure->getResourceMethods() === []) {
             return '';
         }
 
@@ -177,7 +170,7 @@ final readonly class MoonShineStructure
 
         $result = "";
 
-        foreach ($columnStructure->dataValue('resource_methods') as $method) {
+        foreach ($columnStructure->getResourceMethods() as $method) {
             if(! str_contains($method, '(')) {
                 $method .= "()";
             }

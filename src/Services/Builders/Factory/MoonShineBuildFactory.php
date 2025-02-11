@@ -4,12 +4,11 @@ declare(strict_types=1);
 
 namespace DevLnk\MoonShineBuilder\Services\Builders\Factory;
 
-use DevLnk\LaravelCodeBuilder\Exceptions\NotFoundBuilderException;
-use DevLnk\LaravelCodeBuilder\Services\Builders\AbstractBuilder;
-use DevLnk\LaravelCodeBuilder\Services\Builders\Factory\AbstractBuildFactory;
-use DevLnk\MoonShineBuilder\Enums\MoonShineBuildType;
+use DevLnk\MoonShineBuilder\Exceptions\NotFoundBuilderException;
+use DevLnk\MoonShineBuilder\Services\Builders\AbstractBuilder;
+use DevLnk\MoonShineBuilder\Enums\BuildType;
 use DevLnk\MoonShineBuilder\Services\Builders\Contracts\MigrationBuilderContract;
-use DevLnk\MoonShineBuilder\Services\Builders\Contracts\MoonShineModelBuilderContract;
+use DevLnk\MoonShineBuilder\Services\Builders\Contracts\ModelBuilderContract;
 use DevLnk\MoonShineBuilder\Services\Builders\Contracts\ResourceBuilderContract;
 
 final readonly class MoonShineBuildFactory extends AbstractBuildFactory
@@ -29,15 +28,15 @@ final readonly class MoonShineBuildFactory extends AbstractBuildFactory
          * @var AbstractBuilder $builder
          */
         $builder = match($buildType) {
-            MoonShineBuildType::MODEL->value => app(
-                MoonShineModelBuilderContract::class,
+            BuildType::MODEL->value => app(
+                ModelBuilderContract::class,
                 $classParameters
             ),
-            MoonShineBuildType::RESOURCE->value => app(
+            BuildType::RESOURCE->value => app(
                 ResourceBuilderContract::class,
                 $classParameters
             ),
-            MoonShineBuildType::MIGRATION->value => app(
+            BuildType::MIGRATION->value => app(
                 MigrationBuilderContract::class,
                 $classParameters
             ),

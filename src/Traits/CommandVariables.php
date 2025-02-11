@@ -4,11 +4,10 @@ declare(strict_types=1);
 
 namespace DevLnk\MoonShineBuilder\Traits;
 
-use DevLnk\LaravelCodeBuilder\Enums\BuildTypeContract;
-use DevLnk\LaravelCodeBuilder\Services\Builders\Factory\AbstractBuildFactory;
-use DevLnk\LaravelCodeBuilder\Services\CodePath\CodePathContract;
-use DevLnk\LaravelCodeBuilder\Services\CodeStructure\CodeStructure;
-use DevLnk\MoonShineBuilder\Enums\MoonShineBuildType;
+use DevLnk\MoonShineBuilder\Services\Builders\Factory\AbstractBuildFactory;
+use DevLnk\MoonShineBuilder\Services\CodePath\CodePathContract;
+use DevLnk\MoonShineBuilder\Services\CodeStructure\CodeStructure;
+use DevLnk\MoonShineBuilder\Enums\BuildType;
 use DevLnk\MoonShineBuilder\Services\Builders\Factory\MoonShineBuildFactory;
 
 trait CommandVariables
@@ -35,18 +34,10 @@ trait CommandVariables
 
     protected function prepareBuilders(): void
     {
-        $this->builders = $this->builders();
-    }
-
-    /**
-     * @return array<int, BuildTypeContract>
-     */
-    protected function builders(): array
-    {
-        return [
-            MoonShineBuildType::MODEL,
-            MoonShineBuildType::RESOURCE,
-            MoonShineBuildType::MIGRATION,
+        $this->builders = [
+            BuildType::MODEL,
+            BuildType::RESOURCE,
+            BuildType::MIGRATION,
         ];
     }
 }
