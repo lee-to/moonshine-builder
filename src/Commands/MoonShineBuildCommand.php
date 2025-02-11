@@ -8,8 +8,8 @@ use DevLnk\MoonShineBuilder\Enums\BuildTypeContract;
 use DevLnk\MoonShineBuilder\Enums\ParseType;
 use DevLnk\MoonShineBuilder\Enums\BuildType;
 use DevLnk\MoonShineBuilder\Exceptions\CodeGenerateCommandException;
+use DevLnk\MoonShineBuilder\Exceptions\NotFoundBuilderException;
 use DevLnk\MoonShineBuilder\Exceptions\ProjectBuilderException;
-use DevLnk\MoonShineBuilder\Services\Builders\Factory\AbstractBuildFactory;
 use DevLnk\MoonShineBuilder\Services\Builders\Factory\MoonShineBuildFactory;
 use DevLnk\MoonShineBuilder\Services\CodePath\CodePathContract;
 use DevLnk\MoonShineBuilder\Services\CodePath\MoonShineCodePath;
@@ -47,6 +47,8 @@ class MoonShineBuildCommand extends Command
 
     /**
      * @throws CodeGenerateCommandException
+     * @throws FileNotFoundException
+     * @throws NotFoundBuilderException
      * @throws ProjectBuilderException
      */
     public function handle(): int
@@ -73,12 +75,13 @@ class MoonShineBuildCommand extends Command
     /**
      * @throws CodeGenerateCommandException
      * @throws FileNotFoundException
+     * @throws NotFoundBuilderException
      */
     protected function buildCode(CodeStructure $codeStructure, CodePathContract $codePath): void
     {
-        $buildFactory = $this->buildFactory(
+        $buildFactory = new MoonShineBuildFactory(
             $codeStructure,
-            $codePath,
+            $codePath
         );
 
         $validBuilders = array_filter([
@@ -126,7 +129,6 @@ class MoonShineBuildCommand extends Command
 
     /**
      * @return array<int, CodeStructure>
-     *
      * @throws ProjectBuilderException
      */
     protected function codeStructures(): array
@@ -165,6 +167,8 @@ class MoonShineBuildCommand extends Command
 
     /**
      * @throws CodeGenerateCommandException
+     * @throws FileNotFoundException
+     * @throws NotFoundBuilderException
      */
     protected function make(CodeStructure $codeStructure, string $generationPath): void
     {
@@ -258,16 +262,6 @@ class MoonShineBuildCommand extends Command
 
         $code = implode(PHP_EOL, $this->reminderMenuInfo);
         note($code);
-    }
-
-    protected function buildFactory(
-        CodeStructure $codeStructure,
-        CodePathContract $codePath
-    ): AbstractBuildFactory {
-        return new MoonShineBuildFactory(
-            $codeStructure,
-            $codePath
-        );
     }
 
     public function generationPath(): string

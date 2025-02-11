@@ -15,22 +15,21 @@ final class MoonShineStructureFactory
      */
     public function getStructures(ParseType $type, string $target): CodeStructureList
     {
-        $path = '';
-
-        if($type !== ParseType::TABLE) {
-            $path = config('moonshine_builder.builds_dir') . '/' . $target;
-            if(! file_exists($path)) {
-                throw new ProjectBuilderException("File $path not found");
-            }
-            $extension = pathinfo($path, PATHINFO_EXTENSION);
-        } else {
-            $extension = 'mysql';
-        }
-
-        return match ($extension) {
-            'mysql' => StructureFromMysql::make(table: $target, entity: $target,isBelongsTo: true),
-            'json' => StructureFromJson::make($path)->makeStructures(),
-            default => throw new ProjectBuilderException("$extension extension is not supported")
+        return match ($type) {
+            ParseType::TABLE => StructureFromMysql::make(table: $target, entity: $target,isBelongsTo: true),
+            ParseType::JSON => StructureFromJson::make($this->getPath($target))->makeStructures()
         };
+    }
+
+    /**
+     * @throws ProjectBuilderException
+     */
+    private function getPath(string $target): string
+    {
+        $result = config('moonshine_builder.builds_dir') . '/' . $target;
+        if(! file_exists($result)) {
+            throw new ProjectBuilderException("File $result not found");
+        }
+        return $result;
     }
 }
