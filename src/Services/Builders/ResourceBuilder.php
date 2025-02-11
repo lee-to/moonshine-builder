@@ -39,9 +39,9 @@ class ResourceBuilder extends AbstractBuilder implements ResourceBuilderContract
                 ->newLine()
                 ->newLine()
                 ->append("\t")
-                ->append("protected string \$column = '{$this->codeStructure->dataValue('column')}';")
+                ->append("protected string \$column = '{$this->codeStructure->getColumnName()}';")
                 ->value(),
-                ! is_null($this->codeStructure->dataValue('column'))
+                ! is_null($this->codeStructure->getColumnName())
             )
             ->setKey(
                 '{model_use}',

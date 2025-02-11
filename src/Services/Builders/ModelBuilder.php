@@ -133,8 +133,8 @@ class ModelBuilder extends AbstractBuilder implements ModelBuilderContract
                 );
             }
 
-            if($column->dataValue('relation_name')) {
-                $relation = $column->dataValue('relation_name');
+            if($column->getRelationName()) {
+                $relation = $column->getRelationName();
             } else {
                 $relation = $column->relation()->table()->str();
 
@@ -147,8 +147,8 @@ class ModelBuilder extends AbstractBuilder implements ModelBuilderContract
                 ? $column->relation()->foreignColumn()
                 : $column->column();
 
-            $relationModel = ! empty($column->dataValue('model_class'))
-                ? $column->dataValue('model_class')
+            $relationModel = ! empty($column->getModelClass())
+                ? $column->getModelClass()
                 : $column->relation()->table()->str()->camel()->singular()->ucfirst()->value();
 
             $result = $result->newLine()->newLine()->append(

@@ -15,7 +15,6 @@ use DevLnk\MoonShineBuilder\Services\CodePath\CodePathContract;
 use DevLnk\MoonShineBuilder\Services\CodePath\MoonShineCodePath;
 use DevLnk\MoonShineBuilder\Services\CodeStructure\CodeStructure;
 use DevLnk\MoonShineBuilder\Services\CodeStructure\Factories\MoonShineStructureFactory;
-use DevLnk\MoonShineBuilder\Services\CodeStructure\Factories\StructureFromMysql;
 use DevLnk\MoonShineBuilder\Services\StubBuilder;
 use Illuminate\Console\Command;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
@@ -82,22 +81,11 @@ class MoonShineBuildCommand extends Command
             $codePath,
         );
 
-        $validBuildMap = [
-            'withModel' => BuildType::MODEL,
-            'withMigration' => BuildType::MIGRATION,
-            'withResource' => BuildType::RESOURCE,
-        ];
-
-        $validBuilders = [];
-        foreach ($validBuildMap as $dataKey => $builder) {
-            if(
-                ! is_null($codeStructure->dataValue($dataKey))
-                && $codeStructure->dataValue($dataKey) === false
-            ) {
-                continue;
-            }
-            $validBuilders[] = $builder;
-        }
+        $validBuilders = array_filter([
+            $codeStructure->withModel() ? BuildType::MODEL : null,
+            $codeStructure->withMigration() ? BuildType::MIGRATION : null, 
+            $codeStructure->withResource() ? BuildType::RESOURCE : null
+        ]);
 
         foreach ($this->builders as $builder) {
             if(! $builder instanceof BuildTypeContract) {

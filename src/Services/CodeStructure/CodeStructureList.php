@@ -109,7 +109,7 @@ final class CodeStructureList
                 ];
 
                 if(in_array($column->column(), $resourceColumnProperties)) {
-                    $codeStructure->setDataValue('column', $column->column());
+                    $codeStructure->setColumnName($column->column());
                 }
 
                 if($column->relation()) {
@@ -131,7 +131,7 @@ final class CodeStructureList
                 'name' => $codeStructure->entity()->ucFirst(),
                 'timestamps' => $codeStructure->isTimestamps(),
                 'soft_deletes' => $codeStructure->isSoftDeletes(),
-                'column' => $codeStructure->dataValue('column'),
+                'column' => $codeStructure->getColumnName(),
                 'withModel' => false,
                 'withMigration' => false,
                 'fields' => $fields,

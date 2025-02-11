@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace DevLnk\MoonShineBuilder\Support\Traits;
 
 trait DataTrait

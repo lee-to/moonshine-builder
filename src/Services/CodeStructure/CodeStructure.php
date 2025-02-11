@@ -6,18 +6,21 @@ namespace DevLnk\MoonShineBuilder\Services\CodeStructure;
 
 use DevLnk\MoonShineBuilder\Enums\SqlTypeMap;
 use DevLnk\MoonShineBuilder\Support\NameStr;
-use DevLnk\MoonShineBuilder\Support\Traits\DataTrait;
 
 class CodeStructure
 {
-    use DataTrait;
+    private bool $withModel = true;
 
-    /**
-     * @var array<int, ColumnStructure>
-     */
+    private bool $withMigration = true;
+
+    private bool $withResource = true;
+
+    /** @var array<int, ColumnStructure> */
     private array $columns = [];
 
     private readonly NameStr $entity;
+
+    private ?string $columnName = null;
 
     private string $stubDir;
 
@@ -179,5 +182,45 @@ class CodeStructure
             SqlTypeMap::HAS_ONE,
             SqlTypeMap::BELONGS_TO_MANY,
         ];
+    }
+
+    public function getColumnName(): ?string
+    {
+        return $this->columnName;
+    }
+
+    public function setColumnName(?string $columnName): void
+    {
+        $this->columnName = $columnName;
+    }
+
+    public function withModel(): bool
+    {
+        return $this->withModel;
+    }
+
+    public function setWithModel(bool $withModel): void
+    {
+        $this->withModel = $withModel;
+    }
+
+    public function withMigration(): bool
+    {
+        return $this->withMigration;
+    }
+
+    public function setWithMigration(bool $withMigration): void
+    {
+        $this->withMigration = $withMigration;
+    }
+
+    public function withResource(): bool
+    {
+        return $this->withResource;
+    }
+
+    public function setWithResource(bool $withResource): void
+    {
+        $this->withResource = $withResource;
     }
 }

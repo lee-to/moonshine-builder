@@ -5,15 +5,28 @@ declare(strict_types=1);
 namespace DevLnk\MoonShineBuilder\Services\CodeStructure;
 
 use DevLnk\MoonShineBuilder\Enums\SqlTypeMap;
-use DevLnk\MoonShineBuilder\Support\Traits\DataTrait;
 
 final class ColumnStructure
 {
-    use DataTrait;
-
     private ?string $inputType = null;
 
+    private ?string $fieldClass = null;
+
     private ?RelationStructure $relation = null;
+
+    /** For relation resource*/
+    private ?string $resourceClass = null;
+
+    /** To set the name of the relationship method in the model*/
+    private ?string $relationName = null;
+
+    private array $resourceMethods = [];
+
+    private array $migrationMethods = [];
+
+    private array $migrationOptions = [];
+
+    private ?string $modelClass = null;
 
     public function __construct(
         private readonly string $column,
@@ -180,5 +193,75 @@ final class ColumnStructure
         }
 
         $this->inputType = $this->type()->getInputType();
+    }
+
+    public function getFieldClass(): ?string
+    {
+        return $this->fieldClass;
+    }
+
+    public function setFieldClass(?string $fieldClass): void
+    {
+        $this->fieldClass = $fieldClass;
+    }
+
+    public function getResourceClass(): ?string
+    {
+        return $this->resourceClass;
+    }
+
+    public function setResourceClass(?string $resourceClass): void
+    {
+        $this->resourceClass = $resourceClass;
+    }
+
+    public function getModelClass(): ?string
+    {
+        return $this->modelClass;
+    }
+
+    public function setModelClass(?string $modelClass): void
+    {
+        $this->modelClass = $modelClass;
+    }
+
+    public function getResourceMethods(): array
+    {
+        return $this->resourceMethods;
+    }
+
+    public function setResourceMethods(array $resourceMethods): void
+    {
+        $this->resourceMethods = $resourceMethods;
+    }
+
+    public function getMigrationMethods(): array
+    {
+        return $this->migrationMethods;
+    }
+
+    public function setMigrationMethods(array $migrationMethods): void
+    {
+        $this->migrationMethods = $migrationMethods;
+    }
+
+    public function getMigrationOptions(): array
+    {
+        return $this->migrationOptions;
+    }
+
+    public function setMigrationOptions(array $migrationOptions): void
+    {
+        $this->migrationOptions = $migrationOptions;
+    }
+
+    public function getRelationName(): ?string
+    {
+        return $this->relationName;
+    }
+
+    public function setRelationName(?string $relationName): void
+    {
+        $this->relationName = $relationName;
     }
 }
