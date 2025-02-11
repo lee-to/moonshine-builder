@@ -21,30 +21,30 @@ use MoonShine\UI\Fields\Checkbox;
 class ProductResource extends ModelResource
 {
     // TODO model not found
-	protected string $model = Product::class;
+    protected string $model = Product::class;
 
     protected string $title = 'ProductResource';
 
-	protected array $with = ['category', 'comments', 'moonshineUser'];
+    protected array $with = ['category', 'comments', 'moonshineUser'];
 
     public function indexFields(): iterable
     {
         // TODO correct labels values
         return [
-			ID::make('id')
-				->sortable(),
-			Text::make('Name', 'title'),
-			Text::make('Content', 'content'),
-			Number::make('Price', 'price')
-				->default(0)
-				->sortable(),
-			Number::make('Sorting', 'sort_number')
-				->default(0)
-				->sortable(),
-			BelongsTo::make('Category', 'category', resource: CategoryResource::class),
-			HasMany::make('Comments', 'comments', resource: CommentResource::class)->creatable(),
-			BelongsTo::make('User', 'moonshineUser', resource: \MoonShine\Laravel\Resources\MoonShineUserResource::class),
-			Checkbox::make('Active', 'is_active'),
+            ID::make('id')
+                ->sortable(),
+            Text::make('Name', 'title'),
+            Text::make('Content', 'content'),
+            Number::make('Price', 'price')
+                ->default(0)
+                ->sortable(),
+            Number::make('Sorting', 'sort_number')
+                ->default(0)
+                ->sortable(),
+            BelongsTo::make('Category', 'category', resource: CategoryResource::class),
+            HasMany::make('Comments', 'comments', resource: CommentResource::class)->creatable(),
+            BelongsTo::make('User', 'moonshineUser', resource: \MoonShine\Laravel\Resources\MoonShineUserResource::class),
+            Checkbox::make('Active', 'is_active'),
         ];
     }
 
@@ -68,14 +68,14 @@ class ProductResource extends ModelResource
     {
         // TODO change it to your own rules
         return [
-			'id' => ['int', 'nullable'],
-			'title' => ['string', 'nullable'],
-			'content' => ['string', 'nullable'],
-			'price' => ['int', 'nullable'],
-			'sort_number' => ['int', 'nullable'],
-			'category_id' => ['int', 'nullable'],
-			'moonshine_user_id' => ['int', 'nullable'],
-			'is_active' => ['accepted', 'sometimes'],
+            'id' => ['int', 'nullable'],
+            'title' => ['string', 'nullable'],
+            'content' => ['string', 'nullable'],
+            'price' => ['int', 'nullable'],
+            'sort_number' => ['int', 'nullable'],
+            'category_id' => ['int', 'nullable'],
+            'moonshine_user_id' => ['int', 'nullable'],
+            'is_active' => ['accepted', 'sometimes'],
         ];
     }
 }
