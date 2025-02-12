@@ -52,6 +52,7 @@ final readonly class StructureFromOpenapi implements MakeStructureContract
             }
 
             foreach ($methods as $method => $definition) {
+
                 if (! isset($definition['tags']) || ! is_array($definition['tags'])) {
                     continue;
                 }
@@ -68,18 +69,19 @@ final readonly class StructureFromOpenapi implements MakeStructureContract
                 foreach ($foundResourceTags as $tag) {
                     $resourceName = Str::replaceLast('Resource', '', $tag);
                     $resourceKey = strtolower($resourceName);
-                    $finalTableName = $this->getTableName($path, $resourceName);
 
                     if (! isset($resources[$resourceKey])) {
                         $resources[$resourceKey] = new CodeStructure(
-                            table: $finalTableName,
+                            table: str($resourceKey)->snake()->plural()->value(),
                             entity: ucfirst($resourceName),
                         );
 
+                        // TODO migration and model?
                         $resources[$resourceKey]->setWithModel(false);
                         $resources[$resourceKey]->setWithMigration(false);
                     }
 
+                    // TODO merge mod or not?
                     $codeStructure = $resources[$resourceKey];
 
                     if (isset($definition['parameters']) && is_array($definition['parameters'])) {
@@ -125,14 +127,25 @@ final readonly class StructureFromOpenapi implements MakeStructureContract
                 }
             }
         }
+
         $codeStructureList = new CodeStructureList();
-        foreach ($resources as $resource) {
-            $codeStructureList->addCodeStructure($resource);
+        foreach ($resources as $codeStructure) {
+            $validateId = false;
+            foreach ($codeStructure->columns() as $columnStructure) {
+                if($columnStructure->isId()) {
+                    $validateId = true;
+                }
+            }
+            if(! $validateId) {
+                $codeStructure->addColumn(new ColumnStructure('id', 'id', SqlTypeMap::ID, default: null, nullable: false));
+            }
+
+            $codeStructureList->addCodeStructure($codeStructure);
         }
 
         return $codeStructureList;
     }
-    
+
     private function resolveRefColumns(string $refPath, array $components): array
     {
         $split  = explode('/', $refPath);
@@ -161,29 +174,16 @@ final readonly class StructureFromOpenapi implements MakeStructureContract
             default => SqlTypeMap::STRING
         };
 
+        if($column === 'id') {
+            $sqlTypeMap = SqlTypeMap::ID;
+        }
+
         return new ColumnStructure(
             column: $column,
-            name: Str::ucfirst(Str::camel($column)),
+            name: $column,
             type: $sqlTypeMap,
             default: null,
             nullable: true
         );
-    }
-
-    private function getTableName(string $path, string $tagResource): string
-    {
-        $trimPath = ltrim($path, '/');
-
-        $parts = explode('/', $trimPath);
-
-        $candidate = $parts[1] ?? $tagResource;
-
-        $candidate = Str::snake(Str::replace('-', '_', $candidate));
-
-        if (! Str::endsWith($candidate, 's')) {
-            $candidate = Str::plural($candidate);
-        }
-
-        return $candidate;
     }
 } 

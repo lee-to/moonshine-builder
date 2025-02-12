@@ -145,20 +145,12 @@ class MoonShineBuildCommand extends Command
     {
         $target = $this->argument('target');
 
-        if (is_null($target) 
-            &&  (
-                $this->parseType === ParseType::JSON
-                || $this->parseType === ParseType::OPENAPI
-            )
-        ) {
-            $target = select(
-                'File',
-                collect(File::files(config('moonshine_builder.builds_dir')))->mapWithKeys(
-                    fn (SplFileInfo $file): array => [
-                        $file->getFilename() => $file->getFilename(),
-                    ]
-                ),
-            );
+        if (is_null($target) && $this->parseType === ParseType::JSON) {
+            $target = $this->getFileList('json');
+        }
+        
+        if (is_null($target) && $this->parseType === ParseType::OPENAPI) {
+            $target = $this->getFileList('yaml');
         }
 
         if($this->parseType === ParseType::TABLE) {
@@ -176,6 +168,23 @@ class MoonShineBuildCommand extends Command
         $codeStructures = (new MoonShineStructureFactory())->getStructures($this->parseType, $target);
 
         return $codeStructures->makeStructures()->codeStructures();
+    }
+
+    protected function getFileList(string $extension): int|string
+    {
+        return select(
+            'File',
+            collect(File::files(config('moonshine_builder.builds_dir')))->mapWithKeys(
+                static function (SplFileInfo $file) use ($extension): array {
+                    if(! str_contains($file->getFilename(), '.' . $extension)) {
+                        return [];
+                    }
+                    return [
+                        $file->getFilename() => $file->getFilename(),
+                    ];
+                }
+            ),
+        );
     }
 
     /**
