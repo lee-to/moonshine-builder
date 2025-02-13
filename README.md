@@ -93,13 +93,13 @@ database/migrations/2024_05_27_140239_create_categories.php was created successf
 
 WARN  Don't forget to register new resources in the provider method:
 
- new CategoryResource(),
+CategoryResource::class,
 
  ...or in the menu method:
 
  MenuItem::make(
      static fn() => 'CategoryResource',
-     new CategoryResourceResource()
+      CategoryResource::class
  ),
 
 INFO  All done.
