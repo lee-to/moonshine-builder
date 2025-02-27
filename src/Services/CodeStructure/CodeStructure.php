@@ -20,6 +20,8 @@ class CodeStructure
 
     private readonly NameStr $entity;
 
+    private ?string $menuName = null;
+
     private ?string $columnName = null;
 
     private string $stubDir;
@@ -227,5 +229,15 @@ class CodeStructure
     public function setWithResource(bool $withResource): void
     {
         $this->withResource = $withResource;
+    }
+
+    public function menuName(): string
+    {
+        return $this->menuName ?? $this->entity()->ucFirstSingular();
+    }
+
+    public function setMenuName(?string $menuName): void
+    {
+        $this->menuName = $menuName;
     }
 }

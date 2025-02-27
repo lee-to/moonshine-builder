@@ -22,6 +22,10 @@
             "type": "string",
             "description": "Resource name"
           },
+          "menuName": {
+            "type": "string",
+            "description": "Name in menu"
+          },
           "column": {
             "type": "string",
             "description": "Column property in a resource"

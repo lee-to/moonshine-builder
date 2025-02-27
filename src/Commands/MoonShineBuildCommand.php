@@ -133,7 +133,8 @@ class MoonShineBuildCommand extends Command
         $this->reminderResourceInfo[] = "{$resourcePath->rawName()}::class,";
         $this->reminderMenuInfo[] = StubBuilder::make($this->stubDir . 'MenuItem')
             ->getFromStub([
-                '{resource}' => $resourcePath->rawName(),
+                '{menuName}' => $codeStructure->menuName(),
+                '{resource}' => '\\App\\MoonShine\\Resources\\' . $resourcePath->rawName(),
             ])
         ;
     }
