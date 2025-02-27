@@ -19,6 +19,7 @@ use DevLnk\MoonShineBuilder\Services\StubBuilder;
 use Illuminate\Console\Command;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Illuminate\Filesystem\Filesystem;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Schema;
 use SplFileInfo;
@@ -146,14 +147,11 @@ class MoonShineBuildCommand extends Command
         $target = $this->argument('target');
 
         if (is_null($target) && $this->parseType === ParseType::JSON) {
-            $target = select(
-                'File',
-                collect(File::files(config('moonshine_builder.builds_dir')))->mapWithKeys(
-                    fn (SplFileInfo $file): array => [
-                        $file->getFilename() => $file->getFilename(),
-                    ]
-                ),
-            );
+            $target = $this->getFileList('json');
+        }
+        
+        if (is_null($target) && $this->parseType === ParseType::OPENAPI) {
+            $target = $this->getFileList('yaml');
         }
 
         if($this->parseType === ParseType::TABLE) {
@@ -171,6 +169,26 @@ class MoonShineBuildCommand extends Command
         $codeStructures = (new MoonShineStructureFactory())->getStructures($this->parseType, $target);
 
         return $codeStructures->makeStructures()->codeStructures();
+    }
+
+    protected function getFileList(string $extension): int|string
+    {
+        /** @var Collection<array-key, string> $files */
+        $files = collect(File::files(config('moonshine_builder.builds_dir')))->mapWithKeys(
+            static function (SplFileInfo $file) use ($extension): array {
+                if(! str_contains($file->getFilename(), '.' . $extension)) {
+                    return [];
+                }
+                return [
+                    $file->getFilename() => $file->getFilename(),
+                ];
+            }
+        );
+
+        return select(
+            'File',
+            $files,
+        );
     }
 
     /**
@@ -243,9 +261,14 @@ class MoonShineBuildCommand extends Command
             }
         }
 
+        $typeList = [];
+        foreach (ParseType::cases() as $parseType) {
+            $typeList[$parseType->value] = $parseType->toString();
+        }
+
         return $this->option('type') ?? select(
             'Type',
-            array_map(static fn (ParseType $item) => $item->value, ParseType::cases())
+            $typeList
         );
     }
 

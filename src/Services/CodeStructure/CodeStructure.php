@@ -99,6 +99,11 @@ class CodeStructure
             return;
         }
 
+        if ($column->isId()) {
+            array_unshift($this->columns, $column);
+            return;
+        }
+
         $this->columns[] = $column;
 
         $this->setTimestamps($column);
