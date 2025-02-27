@@ -109,7 +109,7 @@ class ProjectBuildTest extends TestCase
             "Number::make('Sorting', 'sort_number')",
             "BelongsTo::make('Category', 'category', resource: CategoryResource::class)",
             "HasMany::make('Comments', 'comments', resource: CommentResource::class)->creatable()",
-            "BelongsTo::make('User', 'moonshineUser', resource: \\MoonShine\\Laravel\\Resources\\MoonShineUserResource::class)",
+            "BelongsTo::make('User', 'moonshineUser', resource: MoonShineUserResource::class)",
             "Checkbox::make('Active', 'is_active')",
             "'id' => ['int', 'nullable']",
             "'title' => ['string', 'nullable']",
@@ -181,7 +181,7 @@ class ProjectBuildTest extends TestCase
             "ID::make('id')",
             "Text::make('Comment', 'comment')",
             "BelongsTo::make('Product', 'product', resource: ProductResource::class)",
-            "BelongsTo::make('User', 'moonshineUser', resource: \\MoonShine\\Laravel\\Resources\\MoonShineUserResource::class)",
+            "BelongsTo::make('User', 'moonshineUser', resource: MoonShineUserResource::class)",
         ];
         foreach ($resourceStringContains as $stringContain) {
             $this->assertStringContainsString($stringContain, $resource);
