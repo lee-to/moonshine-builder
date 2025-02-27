@@ -72,9 +72,15 @@ class MoonShineProjectSchemaCommand extends Command
 
         $dir = config('moonshine_builder.builds_dir');
 
+        $fileSystem = new FileSystem();
+
+        if(!$fileSystem->exists($dir)){
+            $fileSystem->makeDirectory($dir, 0777, true);
+        }
+
         $fileName = "project_" . date('YmdHis') . ".json";
 
-        (new Filesystem())->put("$dir/$fileName", $codeStructures->toJson($pivotTables));
+        $fileSystem->put("$dir/$fileName", $codeStructures->toJson($pivotTables));
 
         $this->warn("$fileName was created successfully! To generate resources, run: ");
         $this->info("php artisan moonshine:build $fileName");

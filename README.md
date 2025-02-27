@@ -78,7 +78,6 @@ php artisan moonshine:build
  ┌ Type ────────────────────────────────────────────────────────┐
  │   ○ table                                                    │
  │ › ● json                                                     │
- │   ○ openapi yaml (beta)                                      │
  │   ○ console                                                  │
  └──────────────────────────────────────────────────────────────┘
 ```
@@ -96,13 +95,13 @@ database/migrations/2024_05_27_140239_create_categories.php was created successf
 
 WARN  Don't forget to register new resources in the provider method:
 
- CategoryResource::class,
+CategoryResource::class,
 
  ...or in the menu method:
 
  MenuItem::make(
      static fn() => 'CategoryResource',
-     CategoryResource::class
+      CategoryResource::class
  ),
 
 INFO  All done.
@@ -123,10 +122,8 @@ INFO  All done.
  ┌ Type ────────────────────────────────────────────────────────┐
  │ › ● table                                                    │
  │   ○ json                                                     │
- │   ○ openapi yaml (beta)                                      │
  │   ○ console                                                  │
  └──────────────────────────────────────────────────────────────┘
-
 ```
 
 Выберите необходимую таблицу:
