@@ -245,7 +245,7 @@ php artisan moonshine:build category.json
 
 <a name="openapi"></a>
 ### Генерация из Openapi схемы (yaml)
-Данная функция находится в разработке, но вы уже можете сформировать данные из своей openapi спецификации в формате yaml. Для этого вам необходимо в секции path, после указания HTTP метода, указать тег <name>Resource, например:
+Данная функция находится в разработке, но вы уже можете сформировать данные из своей openapi спецификации в формате yaml. Для этого вам необходимо в секции path, после указания HTTP метода, указать tag <name>Resource, например:
 ```yaml
 paths:
     /api/users:
@@ -257,6 +257,18 @@ paths:
                     description: A list of users
         post:
             tags: [userResource]
+        #...
+```
+
+Одинаковый tag можно использовать в разных paths одной сущности, это позволит собрать дополнительные поля для вашего ресурса. Например:
+```yaml
+paths:
+    /api/users:
+        post:
+          tags: [userResource]
+          #...
+        put:
+          tags: [userResource]
         #...
 ```
 
