@@ -34,7 +34,10 @@ class ProjectBuildTest extends TestCase
     #[Test]
     public function build(): void
     {
-        $this->artisan('moonshine:build project.json --type=json');
+        $this->artisan('moonshine:build project.json --type=json')
+            ->expectsConfirmation('Add new resources to the provider?')
+            ->expectsConfirmation('Add new resources to the menu?')
+            ->assertSuccessful();
 
         $this->category($this->resourcePath . 'CategoryResource.php', $this->modelPath . 'Category.php');
         $this->product($this->resourcePath . 'ProductResource.php', $this->modelPath . 'Product.php');

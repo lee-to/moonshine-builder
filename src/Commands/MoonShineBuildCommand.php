@@ -16,17 +16,17 @@ use DevLnk\MoonShineBuilder\Services\CodePath\MoonShineCodePath;
 use DevLnk\MoonShineBuilder\Services\CodeStructure\CodeStructure;
 use DevLnk\MoonShineBuilder\Services\CodeStructure\Factories\MoonShineStructureFactory;
 use DevLnk\MoonShineBuilder\Services\StubBuilder;
-use Illuminate\Console\Command;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Schema;
+use MoonShine\Laravel\Commands\MoonShineCommand;
 use SplFileInfo;
 
 use function Laravel\Prompts\{confirm, note, select};
 
-class MoonShineBuildCommand extends Command
+class MoonShineBuildCommand extends MoonShineCommand
 {
     protected $signature = 'moonshine:build {target?} {--type=}';
 
@@ -34,13 +34,16 @@ class MoonShineBuildCommand extends Command
 
     protected ?string $stubDir = '';
 
-    /** @var array<int, string> */
+    /** @var list<string> */
     protected array $reminderResourceInfo = [];
 
-    /** @var array<int, string> */
+    /** @var list<string> */
     protected array $reminderMenuInfo = [];
 
-    /** @var array<array-key, BuildType> */
+    /** @var list<array<array-key, string>> */
+    protected array $resourceInfo = [];
+
+    /** @var list<BuildType> */
     protected array $builders = [];
 
     /** @var array<string, string> */
@@ -130,13 +133,21 @@ class MoonShineBuildCommand extends Command
 
         $resourcePath = $codePath->path(BuildType::RESOURCE->value);
 
+
         $this->reminderResourceInfo[] = "{$resourcePath->rawName()}::class,";
+
         $this->reminderMenuInfo[] = StubBuilder::make($this->stubDir . 'MenuItem')
             ->getFromStub([
                 '{menuName}' => $codeStructure->menuName(),
                 '{resource}' => '\\App\\MoonShine\\Resources\\' . $resourcePath->rawName(),
             ])
         ;
+
+        $this->resourceInfo[] = [
+            'className' => $resourcePath->rawName(),
+            'menuName' => $codeStructure->menuName(),
+            'namespace' => 'App\\MoonShine\\Resources\\'
+        ];
     }
 
     /**
@@ -287,16 +298,27 @@ class MoonShineBuildCommand extends Command
             return;
         }
 
-        $this->components->warn(
-            "Don't forget to register new resources in the provider method:"
-        );
-        $code = implode(PHP_EOL, $this->reminderResourceInfo);
-        note($code);
+        if (confirm('Add new resources to the provider?')) {
+            foreach ($this->resourceInfo as $info) {
+                self::addResourceOrPageToProviderFile($info['className'], namespace: $info['namespace']);
+            }
+        } else {
+            $this->components->warn(
+                "Don't forget to register new resources in the provider method:"
+            );
+            $code = implode(PHP_EOL, $this->reminderResourceInfo);
+            note($code);
+        }
 
-        note("...and in the menu");
-
-        $code = implode(PHP_EOL, $this->reminderMenuInfo);
-        note($code);
+        if (confirm('Add new resources to the menu?')) {
+            foreach ($this->resourceInfo as $info) {
+                self::addResourceOrPageToMenu($info['className'], $info['menuName'], $info['namespace']);
+            }
+        } else {
+            note("Do not forget to add Resources to the menu:");
+            $code = implode(PHP_EOL, $this->reminderMenuInfo);
+            note($code);
+        }
     }
 
     public function generationPath(): string

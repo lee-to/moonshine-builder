@@ -34,7 +34,10 @@ class BelongsToManyBuildTest extends TestCase
     #[Test]
     public function build(): void
     {
-        $this->artisan('moonshine:build belongs_to_many.json');
+        $this->artisan('moonshine:build belongs_to_many.json')
+            ->expectsConfirmation('Add new resources to the provider?')
+            ->expectsConfirmation('Add new resources to the menu?')
+            ->assertSuccessful();
 
         $this->item($this->resourcePath . 'ItemResource.php', $this->modelPath . 'Item.php');
         $this->property($this->resourcePath . 'PropertyResource.php', $this->modelPath . 'Property.php');
