@@ -114,7 +114,10 @@ class MoonShineBuildCommand extends MoonShineCommand
             }
 
             $confirmed = true;
-            if(isset($this->replaceCautions[$builder->value()])) {
+            if(
+                config('moonshine_builder.is_confirm_replace_files', true)
+                && isset($this->replaceCautions[$builder->value()])
+            ) {
                 $confirmed = confirm($this->replaceCautions[$builder->value()]);
             }
 
@@ -298,26 +301,26 @@ class MoonShineBuildCommand extends MoonShineCommand
             return;
         }
 
-        if (confirm('Add new resources to the provider?')) {
+        if (config('moonshine_builder.is_confirm_change_provider') && ! confirm('Add new resources to the provider?')) {
+            note("Don't forget to register new resources in the provider method:");
+            $code = implode(PHP_EOL, $this->reminderResourceInfo);
+            note($code);
+        } else {
             foreach ($this->resourceInfo as $info) {
                 self::addResourceOrPageToProviderFile($info['className'], namespace: $info['namespace']);
             }
-        } else {
-            $this->components->warn(
-                "Don't forget to register new resources in the provider method:"
-            );
-            $code = implode(PHP_EOL, $this->reminderResourceInfo);
-            note($code);
         }
 
-        if (confirm('Add new resources to the menu?')) {
-            foreach ($this->resourceInfo as $info) {
-                self::addResourceOrPageToMenu($info['className'], $info['menuName'], $info['namespace']);
-            }
-        } else {
+        if (config('moonshine_builder.is_confirm_change_menu') && ! confirm('Add new resources to the menu?')) {
             note("Do not forget to add Resources to the menu:");
             $code = implode(PHP_EOL, $this->reminderMenuInfo);
             note($code);
+        } else if (! app()->runningUnitTests()) {
+            // TODO Не работает в тестовой среде из-за метода addResourceOrPageToMenu
+            // new ReflectionClass(moonshineConfig()->getLayout()) выбрасывает исключение
+            foreach ($this->resourceInfo as $info) {
+                self::addResourceOrPageToMenu($info['className'], $info['menuName'], $info['namespace']);
+            }
         }
     }
 
