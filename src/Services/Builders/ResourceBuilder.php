@@ -44,13 +44,7 @@ class ResourceBuilder extends AbstractBuilder implements ResourceBuilderContract
             )
             ->setKey(
                 '{model_use}',
-                $modelUse,
-                ! empty($modelUse)
-            )
-            ->setKey(
-                '{todo_model_not_found}',
-                "// TODO model not found\n\t",
-                empty($modelUse)
+                $modelUse
             )
             ->setKey(
                 '{with_array}',
