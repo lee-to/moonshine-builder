@@ -73,6 +73,10 @@ final readonly class MoonShineStructure
             if(! is_null($column->relation())) {
                 $resourceName = str($column->relation()->table()->camel())->singular()->ucfirst()->value();
 
+                if(str_contains($resourceName, 'Moonshine')) {
+                    $resourceName = str_replace('Moonshine', 'MoonShine', $resourceName);
+                }
+
                 $relationMethod = $column->relation()->table();
                 $relationMethod = $column->type() === SqlTypeMap::BELONGS_TO
                     ? $relationMethod->singular()

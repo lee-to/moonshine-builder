@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace DevLnk\MoonShineBuilder\Services\Builders;
 
+use App\Models\Comment;
 use DevLnk\MoonShineBuilder\Enums\BuildType;
 use DevLnk\MoonShineBuilder\Exceptions\ProjectBuilderException;
 use DevLnk\MoonShineBuilder\Services\Builders\Contracts\ResourceBuilderContract;
@@ -26,9 +27,7 @@ class ResourceBuilder extends AbstractBuilder implements ResourceBuilderContract
         $resourcePath = $this->codePath->path(BuildType::RESOURCE->value);
         $modelPath = $this->codePath->path(BuildType::MODEL->value);
 
-        $modelUse = class_exists($modelPath->namespace() . '\\' . $modelPath->rawName(), false)
-            ? "use {$modelPath->namespace()}\\{$modelPath->rawName()};"
-            : "";
+        $modelUse = "use {$modelPath->namespace()}\\{$modelPath->rawName()};";
 
         $withArray = $this->withArray();
 
@@ -45,13 +44,7 @@ class ResourceBuilder extends AbstractBuilder implements ResourceBuilderContract
             )
             ->setKey(
                 '{model_use}',
-                $modelUse,
-                ! empty($modelUse)
-            )
-            ->setKey(
-                '{todo_model_not_found}',
-                "// TODO model not found\n\t",
-                empty($modelUse)
+                $modelUse
             )
             ->setKey(
                 '{with_array}',

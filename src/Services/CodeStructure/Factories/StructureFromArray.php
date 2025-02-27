@@ -38,6 +38,10 @@ final readonly class StructureFromArray implements MakeStructureContract
                 $codeStructure->setWithResource($resource['withResource']);
             }
 
+            if(isset($resource['menuName'])) {
+                $codeStructure->setMenuName($resource['menuName']);
+            }
+
             $codeStructure->setColumnName($resource['column'] ?? null);
 
             foreach ($resource['fields'] as $field) {

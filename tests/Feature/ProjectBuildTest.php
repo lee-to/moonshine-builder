@@ -53,6 +53,7 @@ class ProjectBuildTest extends TestCase
         $resourceStringContains = [
             "use MoonShine\UI\Fields\ID;",
             "use MoonShine\UI\Fields\Text;",
+            "use App\Models\Category;",
             "protected string \$column = 'name';",
             "ID::make('id')",
             "Text::make('Name', 'name')",
@@ -100,6 +101,7 @@ class ProjectBuildTest extends TestCase
             "use MoonShine\Laravel\Fields\Relationships\BelongsTo;",
             "use MoonShine\Laravel\Fields\Relationships\HasMany;",
             "use MoonShine\UI\Fields\Checkbox;",
+            "use App\Models\Product;",
             "@extends ModelResource<Product>",
             "protected array \$with = ['category', 'comments', 'moonshineUser'];",
             "ID::make('id')\n\t\t\t\t->sortable()",
@@ -109,7 +111,7 @@ class ProjectBuildTest extends TestCase
             "Number::make('Sorting', 'sort_number')",
             "BelongsTo::make('Category', 'category', resource: CategoryResource::class)",
             "HasMany::make('Comments', 'comments', resource: CommentResource::class)->creatable()",
-            "BelongsTo::make('User', 'moonshineUser', resource: \\MoonShine\\Laravel\\Resources\\MoonShineUserResource::class)",
+            "BelongsTo::make('User', 'moonshineUser', resource: MoonShineUserResource::class)",
             "Checkbox::make('Active', 'is_active')",
             "'id' => ['int', 'nullable']",
             "'title' => ['string', 'nullable']",
@@ -121,7 +123,7 @@ class ProjectBuildTest extends TestCase
             "'is_active' => ['accepted', 'sometimes']",
         ];
         foreach ($resourceStringContains as $stringContain) {
-            $this->assertStringContainsString($stringContain, $resource);
+            $this->assertStringContainsString($stringContain, $resource, "Contains not found: $stringContain");
         }
 
         $model = $this->filesystem->get($modelPath);
@@ -176,12 +178,13 @@ class ProjectBuildTest extends TestCase
             "use MoonShine\UI\Fields\ID;",
             "use MoonShine\UI\Fields\Text;",
             "use MoonShine\Laravel\Fields\Relationships\BelongsTo;",
+            "use App\Models\Comment;",
             "@extends ModelResource<Comment>",
             "class CommentResource extends ModelResource",
             "ID::make('id')",
             "Text::make('Comment', 'comment')",
             "BelongsTo::make('Product', 'product', resource: ProductResource::class)",
-            "BelongsTo::make('User', 'moonshineUser', resource: \\MoonShine\\Laravel\\Resources\\MoonShineUserResource::class)",
+            "BelongsTo::make('User', 'moonshineUser', resource: MoonShineUserResource::class)",
         ];
         foreach ($resourceStringContains as $stringContain) {
             $this->assertStringContainsString($stringContain, $resource);
