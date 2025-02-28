@@ -134,23 +134,24 @@ class MoonShineBuildCommand extends MoonShineCommand
             return;
         }
 
-        $resourcePath = $codePath->path(BuildType::RESOURCE->value);
+        if($codeStructure->withResource()) {
+            $resourcePath = $codePath->path(BuildType::RESOURCE->value);
 
+            $this->reminderResourceInfo[] = "{$resourcePath->rawName()}::class,";
 
-        $this->reminderResourceInfo[] = "{$resourcePath->rawName()}::class,";
+            $this->reminderMenuInfo[] = StubBuilder::make($this->stubDir . 'MenuItem')
+                ->getFromStub([
+                    '{menuName}' => $codeStructure->menuName(),
+                    '{resource}' => '\\App\\MoonShine\\Resources\\' . $resourcePath->rawName(),
+                ])
+            ;
 
-        $this->reminderMenuInfo[] = StubBuilder::make($this->stubDir . 'MenuItem')
-            ->getFromStub([
-                '{menuName}' => $codeStructure->menuName(),
-                '{resource}' => '\\App\\MoonShine\\Resources\\' . $resourcePath->rawName(),
-            ])
-        ;
-
-        $this->resourceInfo[] = [
-            'className' => $resourcePath->rawName(),
-            'menuName' => $codeStructure->menuName(),
-            'namespace' => 'App\\MoonShine\\Resources\\'
-        ];
+            $this->resourceInfo[] = [
+                'className' => $resourcePath->rawName(),
+                'menuName' => $codeStructure->menuName(),
+                'namespace' => 'App\\MoonShine\\Resources\\'
+            ];
+        }
     }
 
     /**
