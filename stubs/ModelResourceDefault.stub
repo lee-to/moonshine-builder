@@ -14,7 +14,7 @@ use MoonShine\UI\Components\Layout\Box;
  */
 class {class} extends ModelResource
 {
-    {todo_model_not_found}protected string $model = {model}::class;
+    protected string $model = {model}::class;
 
     protected string $title = '{class}';{column}{with_array}
 
