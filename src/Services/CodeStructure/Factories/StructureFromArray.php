@@ -76,16 +76,21 @@ final readonly class StructureFromArray implements MakeStructureContract
                 }
 
                 if(isset($field['default'])) {
+                    $defaultValue = $columnStructure->inputType() === 'text'
+                        ? "default('{$field['default']}')"
+                        : "default({$field['default']})"
+                    ;
+
                     if(! isset($field['methods'])) {
-                        $field['methods'][] = "default({$field['default']})";
+                        $field['methods'][] = $defaultValue;
                     } else {
-                        array_unshift($field['methods'], "default({$field['default']})");
+                        array_unshift($field['methods'], $defaultValue);
                     }
 
                     if(! isset($field['migration']['methods'])) {
-                        $field['migration']['methods'][] = "default({$field['default']})";
+                        $field['migration']['methods'][] = $defaultValue;
                     } else {
-                        array_unshift($field['migration']['methods'], "default({$field['default']})");
+                        array_unshift($field['migration']['methods'], $defaultValue);
                     }
                 }
 
