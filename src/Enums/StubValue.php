@@ -26,6 +26,8 @@ enum StubValue
 
     case RELATIONS;
 
+    case CASTS;
+
     public function key(): string
     {
         return match ($this) {
@@ -39,6 +41,7 @@ enum StubValue
             self::TIMESTAMPS => '{timestamps}',
             self::TABLE => '{table}',
             self::RELATIONS => '{relations}',
+            self::CASTS => '{castsValues}',
         };
     }
 
@@ -54,6 +57,7 @@ enum StubValue
             self::USE_HAS_MANY => "use Illuminate\Database\Eloquent\Relations\HasMany;",
             self::USE_HAS_ONE => "use Illuminate\Database\Eloquent\Relations\HasOne;",
             self::USE_BELONGS_TO_MANY => "use Illuminate\Database\Eloquent\Relations\BelongsToMany;",
+            self::CASTS => "\n\n\tprotected \$casts = [{casts}\n\t];",
             default => '',
         };
     }

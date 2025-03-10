@@ -17,5 +17,5 @@ class {class} extends Model
 {timestamps}
 {table}
     protected $fillable = [{fillable}
-    ];{relations}
+    ];{castsValues}{relations}
 }

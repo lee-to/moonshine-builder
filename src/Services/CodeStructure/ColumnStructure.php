@@ -28,6 +28,8 @@ final class ColumnStructure
 
     private ?string $modelClass = null;
 
+    private ?string $cast = null;
+
     public function __construct(
         private readonly string $column,
         private string $name,
@@ -118,6 +120,13 @@ final class ColumnStructure
         return  $this->type()->isIdType();
     }
 
+    public function isFileType(): bool
+    {
+        $fileFields = ['File', 'Image'];
+
+        return in_array($this->fieldClass, $fileFields);
+    }
+
     public function isLaravelTimestamp(): bool
     {
         return $this->isCreatedAt() || $this->isUpdatedAt() || $this->isDeletedAt();
@@ -125,6 +134,10 @@ final class ColumnStructure
 
     public function rulesType(): ?string
     {
+        if($this->isFileType()) {
+            return 'file';
+        }
+
         if($this->inputType === 'number') {
             return 'int';
         }
@@ -203,6 +216,20 @@ final class ColumnStructure
     public function setFieldClass(?string $fieldClass): void
     {
         $this->fieldClass = $fieldClass;
+
+        // set json cast
+        if(
+            $this->cast === null
+            && $this->isFileType()
+            && ! empty($this->getResourceMethods())
+        ) {
+            foreach ($this->getResourceMethods() as $method) {
+                if($method === 'multiple') {
+                    $this->setCast('json');
+                    break;
+                }
+            }
+        }
     }
 
     public function getResourceClass(): ?string
@@ -263,5 +290,15 @@ final class ColumnStructure
     public function setRelationName(?string $relationName): void
     {
         $this->relationName = $relationName;
+    }
+
+    public function getCast(): ?string
+    {
+        return $this->cast;
+    }
+
+    public function setCast(?string $cast): void
+    {
+        $this->cast = $cast;
     }
 }

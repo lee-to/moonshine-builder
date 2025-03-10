@@ -68,10 +68,16 @@ class ModelBuilder extends AbstractBuilder implements ModelBuilderContract
                 StubValue::TABLE->value() . " '{$this->codeStructure->table()}';\n",
                 $this->codeStructure->table() !== $this->codeStructure->entity()->str()->plural()->snake()->value()
             )
+            ->setKey(
+                StubValue::CASTS->key(),
+                StubValue::CASTS->value(),
+                $this->getCastsCount() !== 0
+            )
             ->makeFromStub($modelPath->file(), [
                 '{namespace}' => $modelPath->namespace(),
                 '{class}' => $this->codeStructure->entity()->ucFirstSingular(),
                 '{fillable}' => $this->columnsToModel(),
+                '{casts}' => $this->castsToModel(),
             ])
         ;
     }
@@ -92,6 +98,28 @@ class ModelBuilder extends AbstractBuilder implements ModelBuilderContract
             $result .= str("'{$column->column()}'")
                 ->prepend("\t\t")
                 ->prepend(PHP_EOL)
+                ->append(',')
+                ->value()
+            ;
+        }
+
+        return $result;
+    }
+
+    public function castsToModel(): string
+    {
+        $result = "";
+
+        foreach ($this->codeStructure->columns() as $column) {
+            if($column->getCast() === null) {
+                continue;
+            }
+
+            $result .= str("'{$column->column()}'")
+                ->prepend("\t\t")
+                ->prepend(PHP_EOL)
+                ->append(" => ")
+                ->append("'{$column->getCast()}'")
                 ->append(',')
                 ->value()
             ;
@@ -161,5 +189,14 @@ class ModelBuilder extends AbstractBuilder implements ModelBuilderContract
         }
 
         return $result->value();
+    }
+
+    private function getCastsCount(): int
+    {
+        $count = 0;
+        foreach ($this->codeStructure->columns() as $column) {
+            $count += $column->getCast() !== null ? 1 : 0;
+        }
+        return $count;
     }
 }

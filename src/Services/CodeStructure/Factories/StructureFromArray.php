@@ -89,10 +89,6 @@ final readonly class StructureFromArray implements MakeStructureContract
                     }
                 }
 
-                if(! empty($field['methods'])) {
-                    $columnStructure->setResourceMethods($field['methods']);
-                }
-
                 if(! empty($field['migration'])) {
                     if(! empty($field['migration']['options'])) {
                         $columnStructure->setMigrationOptions($field['migration']['options']);
@@ -109,6 +105,10 @@ final readonly class StructureFromArray implements MakeStructureContract
 
                 if(! empty($field['model_class'])) {
                     $columnStructure->setModelClass($field['model_class']);
+                }
+
+                if(! empty($field['methods'])) {
+                    $columnStructure->setResourceMethods($field['methods']);
                 }
 
                 if(! empty($field['field'])) {

@@ -141,7 +141,7 @@
                     {"const": "tinyText"},
                     {"const": "uuid"},
                     {"const": "timestamp"},
-                    {"const": "datetime"},
+                    {"const": "dateTime"},
                     {"const": "year"},
                     {"const": "date"},
                     {"const": "time"},
