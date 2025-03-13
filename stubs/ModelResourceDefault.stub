@@ -39,6 +39,12 @@ class {class} extends ModelResource
         ];
     }
 
+    public function filters(): iterable
+    {
+        return [{filters}
+        ];
+    }
+
     public function rules(mixed $item): array
     {
         // TODO change it to your own rules

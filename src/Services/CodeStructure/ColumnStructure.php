@@ -12,6 +12,8 @@ final class ColumnStructure
 
     private ?string $fieldClass = null;
 
+    private bool $hasFilter = false;
+
     private ?RelationStructure $relation = null;
 
     /** For relation resource*/
@@ -300,5 +302,15 @@ final class ColumnStructure
     public function setCast(?string $cast): void
     {
         $this->cast = $cast;
+    }
+
+    public function hasFilter(): bool
+    {
+        return $this->hasFilter;
+    }
+
+    public function setHasFilter(bool $hasFilter): void
+    {
+        $this->hasFilter = $hasFilter;
     }
 }

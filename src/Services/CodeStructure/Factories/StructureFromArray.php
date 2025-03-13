@@ -75,6 +75,10 @@ final readonly class StructureFromArray implements MakeStructureContract
                     }
                 }
 
+                if(isset($field['hasFilter'])) {
+                    $columnStructure->setHasFilter($field['hasFilter']);
+                }
+
                 if(isset($field['default'])) {
                     $defaultValue = $columnStructure->inputType() === 'text'
                         ? "default('{$field['default']}')"

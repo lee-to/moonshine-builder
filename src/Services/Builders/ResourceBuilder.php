@@ -58,6 +58,7 @@ class ResourceBuilder extends AbstractBuilder implements ResourceBuilderContract
                 '{model}' => $modelPath->rawName(),
                 '{with}' => $this->withArray(),
                 '{fields}' => $this->columnsToResource(),
+                '{filters}' => $this->columnsToResource(onlyFilters: true),
                 '{rules}' => $this->columnsToRules(),
             ]);
     }
@@ -79,11 +80,11 @@ class ResourceBuilder extends AbstractBuilder implements ResourceBuilderContract
     /**
      * @throws ProjectBuilderException
      */
-    protected function columnsToResource(): string
+    protected function columnsToResource(bool $onlyFilters = false): string
     {
         $result = "";
 
-        foreach ($this->moonShineStructure->getFields(tabulation: 4) as $field) {
+        foreach ($this->moonShineStructure->getFields(tabulation: 4, onlyFilters: $onlyFilters) as $field) {
             $result .= str($field)
                 ->prepend("\t\t\t")
                 ->prepend("\n")

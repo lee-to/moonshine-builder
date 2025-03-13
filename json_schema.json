@@ -67,6 +67,9 @@
                 "name": {
                   "type": "string"
                 },
+                "hasFilter" : {
+                  "type": "boolean"
+                },
                 "default": {
                   "description": "Default value for migration and resource"
                 },
