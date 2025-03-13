@@ -129,6 +129,16 @@ final class ColumnStructure
         return in_array($this->fieldClass, $fileFields);
     }
 
+    public function hasMultiple(): bool
+    {
+        foreach ($this->getResourceMethods() as $method) {
+            if(str_contains($method, 'multiple(')) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public function isLaravelTimestamp(): bool
     {
         return $this->isCreatedAt() || $this->isUpdatedAt() || $this->isDeletedAt();
@@ -137,6 +147,9 @@ final class ColumnStructure
     public function rulesType(): ?string
     {
         if($this->isFileType()) {
+            if($this->hasMultiple()) {
+                return 'array';
+            }
             return 'file';
         }
 
@@ -220,17 +233,8 @@ final class ColumnStructure
         $this->fieldClass = $fieldClass;
 
         // set json cast
-        if(
-            $this->cast === null
-            && $this->isFileType()
-            && ! empty($this->getResourceMethods())
-        ) {
-            foreach ($this->getResourceMethods() as $method) {
-                if($method === 'multiple') {
-                    $this->setCast('json');
-                    break;
-                }
-            }
+        if($this->cast === null && $this->isFileType() && $this->hasMultiple()) {
+            $this->setCast('json');
         }
     }
 
