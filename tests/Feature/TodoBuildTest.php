@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace DevLnk\MoonShineBuilder\Tests\Feature;
 
 use DevLnk\MoonShineBuilder\Tests\TestCase;
@@ -38,7 +40,6 @@ class TodoBuildTest extends TestCase
 
         $this->task($this->resourcePath . 'TaskResource.php', $this->modelPath . 'Task.php');
         $this->taskAttachment($this->resourcePath . 'TaskAttachmentResource.php', $this->modelPath . 'TaskAttachment.php');
-//        $this->comments($this->resourcePath . 'CommentResource.php', $this->modelPath . 'Comment.php');
     }
 
     /**
