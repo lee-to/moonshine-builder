@@ -130,7 +130,7 @@ class TodoBuildTest extends TestCase
         $migrations = $this->filesystem->allFiles($this->migrationPath);
         foreach ($migrations as $migration) {
             if(str_contains((string) $migration, $migrationName)) {
-                $migrationFile = $migration;
+                $migrationFile = (string) $migration;
 
                 break;
             }
