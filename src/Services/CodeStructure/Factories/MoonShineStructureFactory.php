@@ -6,7 +6,6 @@ namespace DevLnk\MoonShineBuilder\Services\CodeStructure\Factories;
 
 use DevLnk\MoonShineBuilder\Enums\ParseType;
 use DevLnk\MoonShineBuilder\Exceptions\ProjectBuilderException;
-use DevLnk\MoonShineBuilder\Services\CodeStructure\CodeStructureList;
 
 final class MoonShineStructureFactory
 {

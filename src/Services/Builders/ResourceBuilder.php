@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace DevLnk\MoonShineBuilder\Services\Builders;
 
-use App\Models\Comment;
 use DevLnk\MoonShineBuilder\Enums\BuildType;
 use DevLnk\MoonShineBuilder\Exceptions\ProjectBuilderException;
 use DevLnk\MoonShineBuilder\Services\Builders\Contracts\ResourceBuilderContract;
