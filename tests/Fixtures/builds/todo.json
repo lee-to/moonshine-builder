@@ -1,0 +1,182 @@
+{
+    "resources": [
+        {
+            "name": "Stage",
+            "menuName": "Стадии",
+            "column": "title",
+            "timestamps": true,
+            "fields": [
+                {
+                    "column": "id",
+                    "type": "id"
+                },
+                {
+                    "column": "title",
+                    "type": "string",
+                    "name": "Название"
+                },
+                {
+                    "column": "sort",
+                    "type": "integer",
+                    "name": "Порядок",
+                    "default": 0,
+                    "methods": [
+                        "sortable"
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "Tag",
+            "menuName": "Теги",
+            "column": "title",
+            "timestamps": true,
+            "fields": [
+                {
+                    "column": "id",
+                    "type": "id"
+                },
+                {
+                    "column": "title",
+                    "type": "string",
+                    "name": "Название"
+                }
+            ]
+        },
+        {
+            "name": "Task",
+            "menuName": "Задачи",
+            "column": "title",
+            "timestamps": true,
+            "soft_deletes": true,
+            "fields": [
+                {
+                    "column": "id",
+                    "type": "id",
+                    "methods": [
+                        "sortable"
+                    ]
+                },
+                {
+                    "column": "title",
+                    "type": "string",
+                    "name": "Название",
+                    "hasFilter": true
+                },
+                {
+                    "column": "content",
+                    "type": "longText",
+                    "name": "Описание"
+                },
+                {
+                    "column": "priority",
+                    "type": "string",
+                    "name": "Приоритет",
+                    "field": "Select",
+                    "default": "Низкий",
+                    "methods": [
+                        "options(['Низкий', 'Средний', 'Высокий'])"
+                    ]
+                },
+                {
+                    "column": "deadline",
+                    "type": "dateTime",
+                    "name": "Дедлайн"
+                },
+                {
+                    "column": "moonshine_user_id",
+                    "type": "BelongsTo",
+                    "name": "Ответственный",
+                    "relation": {
+                        "table": "moonshine_users"
+                    },
+                    "model_class": "\\MoonShine\\Laravel\\Models\\MoonshineUser"
+                },
+                {
+                    "column": "stage_id",
+                    "type": "BelongsTo",
+                    "name": "Стадия",
+                    "relation": {
+                        "table": "stages"
+                    }
+                },
+                {
+                    "column": "tags",
+                    "type": "BelongsToMany",
+                    "name": "Теги",
+                    "relation": {
+                        "table": "tags",
+                        "foreign_key": "task_id"
+                    }
+                },
+                {
+                    "column": "attachments",
+                    "type": "HasMany",
+                    "name": "Вложения",
+                    "relation": {
+                        "table": "task_attachments",
+                        "foreign_key": "task_id"
+                    },
+                    "methods": [
+                        "creatable"
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "TaskTagPivot",
+            "withResource": false,
+            "table": "tag_task",
+            "fields": [
+                {
+                    "column": "id",
+                    "type": "id"
+                },
+                {
+                    "column": "task_id",
+                    "type": "BelongsTo",
+                    "relation": {
+                        "table": "tasks"
+                    }
+                },
+                {
+                    "column": "tag_id",
+                    "type": "BelongsTo",
+                    "relation": {
+                        "table": "tags"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "TaskAttachment",
+            "menuName": "Вложения",
+            "column": "attachment",
+            "table": "task_attachments",
+            "timestamps": true,
+            "fields": [
+                {
+                    "column": "id",
+                    "type": "id"
+                },
+                {
+                    "column": "task_id",
+                    "type": "BelongsTo",
+                    "name": "Задача",
+                    "relation": {
+                        "table": "tasks"
+                    }
+                },
+                {
+                    "column": "attachment",
+                    "type": "string",
+                    "name": "Файл",
+                    "field": "File",
+                    "methods": [
+                        "multiple()"
+                    ]
+                }
+            ]
+        }
+    ]
+}

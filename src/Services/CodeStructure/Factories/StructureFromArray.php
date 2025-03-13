@@ -75,22 +75,27 @@ final readonly class StructureFromArray implements MakeStructureContract
                     }
                 }
 
+                if(isset($field['hasFilter'])) {
+                    $columnStructure->setHasFilter($field['hasFilter']);
+                }
+
                 if(isset($field['default'])) {
+                    $defaultValue = $columnStructure->inputType() === 'text'
+                        ? "default('{$field['default']}')"
+                        : "default({$field['default']})"
+                    ;
+
                     if(! isset($field['methods'])) {
-                        $field['methods'][] = "default({$field['default']})";
+                        $field['methods'][] = $defaultValue;
                     } else {
-                        array_unshift($field['methods'], "default({$field['default']})");
+                        array_unshift($field['methods'], $defaultValue);
                     }
 
                     if(! isset($field['migration']['methods'])) {
-                        $field['migration']['methods'][] = "default({$field['default']})";
+                        $field['migration']['methods'][] = $defaultValue;
                     } else {
-                        array_unshift($field['migration']['methods'], "default({$field['default']})");
+                        array_unshift($field['migration']['methods'], $defaultValue);
                     }
-                }
-
-                if(! empty($field['methods'])) {
-                    $columnStructure->setResourceMethods($field['methods']);
                 }
 
                 if(! empty($field['migration'])) {
@@ -109,6 +114,10 @@ final readonly class StructureFromArray implements MakeStructureContract
 
                 if(! empty($field['model_class'])) {
                     $columnStructure->setModelClass($field['model_class']);
+                }
+
+                if(! empty($field['methods'])) {
+                    $columnStructure->setResourceMethods($field['methods']);
                 }
 
                 if(! empty($field['field'])) {

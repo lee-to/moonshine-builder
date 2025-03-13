@@ -56,12 +56,16 @@ final readonly class MoonShineStructure
      * @throws ProjectBuilderException
      * @return array<int, string>
      */
-    public function getFields(int $tabulation = 0): array
+    public function getFields(int $tabulation = 0, bool $onlyFilters = false): array
     {
         $fields = [];
 
         foreach ($this->codeStructure->columns() as $column) {
             if($column->isLaravelTimestamp()) {
+                continue;
+            }
+
+            if($onlyFilters && ! $column->hasFilter()) {
                 continue;
             }
 

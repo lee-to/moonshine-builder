@@ -12,6 +12,8 @@ final class ColumnStructure
 
     private ?string $fieldClass = null;
 
+    private bool $hasFilter = false;
+
     private ?RelationStructure $relation = null;
 
     /** For relation resource*/
@@ -27,6 +29,8 @@ final class ColumnStructure
     private array $migrationOptions = [];
 
     private ?string $modelClass = null;
+
+    private ?string $cast = null;
 
     public function __construct(
         private readonly string $column,
@@ -118,6 +122,23 @@ final class ColumnStructure
         return  $this->type()->isIdType();
     }
 
+    public function isFileType(): bool
+    {
+        $fileFields = ['File', 'Image'];
+
+        return in_array($this->fieldClass, $fileFields);
+    }
+
+    public function hasMultiple(): bool
+    {
+        foreach ($this->getResourceMethods() as $method) {
+            if(str_contains($method, 'multiple(')) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public function isLaravelTimestamp(): bool
     {
         return $this->isCreatedAt() || $this->isUpdatedAt() || $this->isDeletedAt();
@@ -125,6 +146,13 @@ final class ColumnStructure
 
     public function rulesType(): ?string
     {
+        if($this->isFileType()) {
+            if($this->hasMultiple()) {
+                return 'array';
+            }
+            return 'file';
+        }
+
         if($this->inputType === 'number') {
             return 'int';
         }
@@ -203,6 +231,11 @@ final class ColumnStructure
     public function setFieldClass(?string $fieldClass): void
     {
         $this->fieldClass = $fieldClass;
+
+        // set json cast
+        if($this->cast === null && $this->isFileType() && $this->hasMultiple()) {
+            $this->setCast('json');
+        }
     }
 
     public function getResourceClass(): ?string
@@ -263,5 +296,25 @@ final class ColumnStructure
     public function setRelationName(?string $relationName): void
     {
         $this->relationName = $relationName;
+    }
+
+    public function getCast(): ?string
+    {
+        return $this->cast;
+    }
+
+    public function setCast(?string $cast): void
+    {
+        $this->cast = $cast;
+    }
+
+    public function hasFilter(): bool
+    {
+        return $this->hasFilter;
+    }
+
+    public function setHasFilter(bool $hasFilter): void
+    {
+        $this->hasFilter = $hasFilter;
     }
 }
