@@ -5,10 +5,13 @@ declare(strict_types=1);
 namespace DevLnk\MoonShineBuilder\Services\CodeStructure\Factories;
 
 use DevLnk\MoonShineBuilder\Enums\SqlTypeMap;
+use DevLnk\MoonShineBuilder\Exceptions\ProjectBuilderException;
 use DevLnk\MoonShineBuilder\Services\CodeStructure\CodeStructure;
 use DevLnk\MoonShineBuilder\Services\CodeStructure\CodeStructureList;
 use DevLnk\MoonShineBuilder\Services\CodeStructure\ColumnStructure;
 use DevLnk\MoonShineBuilder\Services\CodeStructure\RelationStructure;
+use Throwable;
+use ValueError;
 
 final readonly class StructureFromArray implements MakeStructureContract
 {
@@ -17,9 +20,16 @@ final readonly class StructureFromArray implements MakeStructureContract
     ) {
     }
 
+    /**
+     * @throws ProjectBuilderException
+     */
     public function makeStructures(): CodeStructureList
     {
         $codeStructures = new CodeStructureList();
+
+        if(! isset($this->data['resources'])) {
+            throw new ProjectBuilderException('No resources array found.');
+        }
 
         foreach ($this->data['resources'] as $resource) {
             $table = $resource['table'] ?? str($resource['name'])->snake()->lower()->plural()->value();
@@ -45,11 +55,16 @@ final readonly class StructureFromArray implements MakeStructureContract
             $codeStructure->setColumnName($resource['column'] ?? null);
 
             foreach ($resource['fields'] as $field) {
+                try {
+                    $type = SqlTypeMap::from($field['type']);
+                } catch (ValueError) {
+                    throw new ProjectBuilderException("For column '{$field['column']}' the wrong type '{$field['type']}' is set.");
+                }
 
                 $columnStructure = new ColumnStructure(
                     column: $field['column'],
                     name: $field['name'] ?? '',
-                    type: SqlTypeMap::from($field['type']),
+                    type: $type,
                     default: isset($field['default']) ? (string) $field['default'] : null,
                     nullable: true
                 );
@@ -63,6 +78,10 @@ final readonly class StructureFromArray implements MakeStructureContract
                         )
                     ) {
                         $field['relation']['foreign_key'] = 'id';
+                    }
+
+                    if(! isset($field['relation']['foreign_key'])) {
+                        throw new ProjectBuilderException("For column '{$field['column']}' in the relation parameter, you must specify 'foreign_key'.");
                     }
 
                     $columnStructure->setRelation(new RelationStructure(
