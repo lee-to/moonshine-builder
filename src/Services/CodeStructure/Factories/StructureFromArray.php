@@ -66,7 +66,8 @@ final readonly class StructureFromArray implements MakeStructureContract
                     name: $field['name'] ?? '',
                     type: $type,
                     default: isset($field['default']) ? (string) $field['default'] : null,
-                    nullable: true
+                    nullable: $field['nullable'] ?? false,
+                    required: $field['required'] ?? false,
                 );
 
                 if(! empty($field['relation'])) {
@@ -152,7 +153,8 @@ final readonly class StructureFromArray implements MakeStructureContract
                     name: 'Created at',
                     type: SqlTypeMap::TIMESTAMP,
                     default: null,
-                    nullable: true
+                    nullable: true,
+                    required: false,
                 );
                 $codeStructure->addColumn($createdAtField);
 
@@ -161,7 +163,8 @@ final readonly class StructureFromArray implements MakeStructureContract
                     name: 'Updated at',
                     type: SqlTypeMap::TIMESTAMP,
                     default: null,
-                    nullable: true
+                    nullable: true,
+                    required: false,
                 );
                 $codeStructure->addColumn($updatedAtField);
             }
@@ -172,7 +175,8 @@ final readonly class StructureFromArray implements MakeStructureContract
                     name: 'Deleted at',
                     type: SqlTypeMap::TIMESTAMP,
                     default: null,
-                    nullable: true
+                    nullable: true,
+                    required: false,
                 );
                 $codeStructure->addColumn($softDeletes);
             }

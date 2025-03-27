@@ -43,7 +43,8 @@
         {
           "column": "content",
           "type": "text",
-          "name": "Content"
+          "name": "Content",
+          "nullable": true
         },
         {
           "column": "price",

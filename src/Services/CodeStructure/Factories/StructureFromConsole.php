@@ -45,7 +45,8 @@ final readonly class StructureFromConsole implements MakeStructureContract
                 name: $value['name'],
                 type: SqlTypeMap::from($value['type']),
                 default: null,
-                nullable: true
+                nullable: false,
+                required: true,
             );
 
             if (! empty($value['relationTable'])) {
@@ -73,7 +74,8 @@ final readonly class StructureFromConsole implements MakeStructureContract
                 name: 'Created at',
                 type: SqlTypeMap::TIMESTAMP,
                 default: null,
-                nullable: true
+                nullable: true,
+                required: false,
             );
             $codeStructure->addColumn($createdAtField);
 
@@ -82,7 +84,8 @@ final readonly class StructureFromConsole implements MakeStructureContract
                 name: 'Updated at',
                 type: SqlTypeMap::TIMESTAMP,
                 default: null,
-                nullable: true
+                nullable: true,
+                required: false,
             );
             $codeStructure->addColumn($updatedAtField);
         }
@@ -93,7 +96,8 @@ final readonly class StructureFromConsole implements MakeStructureContract
                 name: 'Deleted at',
                 type: SqlTypeMap::TIMESTAMP,
                 default: null,
-                nullable: true
+                nullable: true,
+                required: false,
             );
             $codeStructure->addColumn($softDeletes);
         }

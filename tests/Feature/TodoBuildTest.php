@@ -58,6 +58,8 @@ class TodoBuildTest extends TestCase
             "ID::make('id')",
             "->default('Низкий')",
             "public function filters(): iterable",
+            "public function filters(): iterable",
+            "'title' => ['string', 'required']"
         ];
         foreach ($resourceStringContains as $stringContain) {
             $this->assertStringContainsString($stringContain, $resource);
@@ -98,7 +100,7 @@ class TodoBuildTest extends TestCase
             "BelongsTo::make('Задача', 'task', resource: TaskResource::class),",
             "File::make('Файл', 'attachment')",
             "->multiple(),",
-            "'attachment' => ['array', 'nullable'],",
+            "'attachment' => ['array', 'required'],",
         ];
         foreach ($resourceStringContains as $stringContain) {
             $this->assertStringContainsString($stringContain, $resource);

@@ -116,6 +116,7 @@ final readonly class StructureFromMysql implements MakeStructureContract
                 type: $sqlType,
                 default: $column['default'],
                 nullable: $column['nullable'],
+                required: false,
             );
 
             if($this->isBelongsTo && isset($foreignList[$column['name']])) {
@@ -135,6 +136,7 @@ final readonly class StructureFromMysql implements MakeStructureContract
                 type: SqlTypeMap::HAS_MANY,
                 default: '[]',
                 nullable: false,
+                required: false,
             );
             $columnStructure->setRelation(new RelationStructure(
                 str($this->table)->singular()->snake()->value() . '_id',
@@ -149,7 +151,8 @@ final readonly class StructureFromMysql implements MakeStructureContract
                 name: str($tableName)->singular()->snake()->value(),
                 type: SqlTypeMap::HAS_ONE,
                 default: null,
-                nullable: true,
+                nullable: false,
+                required: false,
             );
             $columnStructure->setRelation(new RelationStructure(
                 str($this->table)->singular()->snake()->value() . '_id',
@@ -165,6 +168,7 @@ final readonly class StructureFromMysql implements MakeStructureContract
                 type: SqlTypeMap::BELONGS_TO_MANY,
                 default: '[]',
                 nullable: false,
+                required: false,
             );
             $columnStructure->setRelation(new RelationStructure(
                 str($this->table)->singular()->snake()->value() . '_id',
