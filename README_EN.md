@@ -60,20 +60,9 @@ app/Models/Category.php was created successfully!
 app/MoonShine/Resources/CategoryResource.php was created successfully!
 database/migrations/2024_05_27_140239_create_categories.php was created successfully!
 
-WARN  Don't forget to register new resources in the provider method:
-
- new CategoryResource(),
-
- ...or in the menu method:
-
- MenuItem::make(
-     static fn() => 'CategoryResource',
-     new CategoryResourceResource()
- ),
-
 INFO  All done.
-
 ```
+
 ### Creating a Schema
 In the <code>builds_dir</code> directory, create a schema file, for example, <code>category.json</code>:
 ```json
