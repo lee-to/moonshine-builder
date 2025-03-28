@@ -61,7 +61,9 @@
                     "column": "title",
                     "type": "string",
                     "name": "Название",
-                    "hasFilter": true
+                    "hasFilter": true,
+                    "nullable": true,
+                    "required": true
                 },
                 {
                     "column": "content",

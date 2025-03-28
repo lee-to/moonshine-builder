@@ -73,6 +73,14 @@
                 "default": {
                   "description": "Default value for migration and resource"
                 },
+                "nullable" : {
+                  "description": "Whether the nullable field is added the corresponding method to migration",
+                  "type": "boolean"
+                },
+                "required" : {
+                  "description": "Whether the field is mandatory. required will set in the rules",
+                  "type": "boolean"
+                },
                 "methods": {
                   "type": "array",
                   "description": "MoonShine field Methods",

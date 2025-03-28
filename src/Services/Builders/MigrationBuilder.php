@@ -128,18 +128,17 @@ class MigrationBuilder extends AbstractBuilder implements MigrationBuilderContra
 
     protected function migrationMethods(ColumnStructure $column): string
     {
-        if($column->getMigrationMethods() === []) {
-            return '';
-        }
-
         $result = "";
+
+        if($column->getMigrationMethods() === []) {
+            return $result;
+        }
 
         foreach ($column->getMigrationMethods() as $method) {
             if(! str_contains($method, '(')) {
                 $method .= "()";
             }
             $result .= "->$method";
-
         }
 
         return $result;

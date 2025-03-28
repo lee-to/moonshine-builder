@@ -35,9 +35,10 @@ final class ColumnStructure
     public function __construct(
         private readonly string $column,
         private string $name,
-        private SqlTypeMap $type,
+        private readonly SqlTypeMap $type,
         private readonly ?string $default,
-        private readonly bool $nullable
+        private readonly bool $nullable,
+        private readonly bool $required,
     ) {
         if(empty($this->name)) {
             $this->name = str($this->column)->camel()->ucfirst()->value();
@@ -87,9 +88,19 @@ final class ColumnStructure
         return $this->default;
     }
 
-    public function nullable(): bool
+    public function isNullable(): bool
     {
         return $this->nullable;
+    }
+
+    public function isRequired(): bool
+    {
+        // If it is impossible to set the NULL field, then this field must be required
+        if(! in_array('nullable()', $this->getMigrationMethods())) {
+            return true;
+        }
+
+        return $this->required;
     }
 
     public function setRelation(RelationStructure $relation): void
@@ -162,7 +173,7 @@ final class ColumnStructure
         }
 
         if($this->inputType === 'checkbox') {
-            return 'accepted';
+            return 'boolean';
         }
 
         return $this->inputType;
@@ -270,6 +281,9 @@ final class ColumnStructure
 
     public function getMigrationMethods(): array
     {
+        if($this->isNullable() && ! in_array('nullable()', $this->migrationMethods)) {
+            $this->migrationMethods[] = 'nullable()';
+        }
         return $this->migrationMethods;
     }
 

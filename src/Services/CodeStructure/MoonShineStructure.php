@@ -125,6 +125,10 @@ final readonly class MoonShineStructure
         $rules = [];
 
         foreach ($this->codeStructure->columns() as $column) {
+            if($column->isId()) {
+                continue;
+            }
+
             if(
                 in_array($column->column(), $this->codeStructure->dateColumns())
                 || in_array($column->type(), $this->codeStructure->noInputType())
@@ -132,13 +136,10 @@ final readonly class MoonShineStructure
                 continue;
             }
 
+            $requiredValue = $column->isRequired() ? 'required' : 'nullable';
+
             $rules[] = str("'{$column->column()}' => ['{$column->rulesType()}'")
-                ->when(
-                    $column->type() === SqlTypeMap::BOOLEAN,
-                    fn ($str) => $str->append(", 'sometimes'"),
-                    fn ($str) => $str->append(", 'nullable'")
-                )
-                ->append(']')
+                ->append(", '$requiredValue']")
                 ->value()
             ;
         }

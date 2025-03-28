@@ -82,7 +82,8 @@ final class CodeStructureList
                         name: '',
                         type: SqlTypeMap::BELONGS_TO_MANY,
                         default: null,
-                        nullable: true
+                        nullable: false,
+                        required: false,
                     );
                     $field->setRelation(new RelationStructure('id', $relationColumn));
 

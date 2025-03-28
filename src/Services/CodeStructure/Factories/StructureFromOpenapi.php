@@ -137,7 +137,15 @@ final readonly class StructureFromOpenapi implements MakeStructureContract
                 }
             }
             if(! $validateId) {
-                $codeStructure->addColumn(new ColumnStructure('id', 'id', SqlTypeMap::ID, default: null, nullable: false));
+                $codeStructure->addColumn(new ColumnStructure(
+                        'id',
+                        'id',
+                        SqlTypeMap::ID,
+                        default: null,
+                        nullable: false,
+                        required: false
+                    )
+                );
             }
 
             $codeStructureList->addCodeStructure($codeStructure);
@@ -183,7 +191,8 @@ final readonly class StructureFromOpenapi implements MakeStructureContract
             name: $column,
             type: $sqlTypeMap,
             default: null,
-            nullable: true
+            nullable: false,
+            required: false,
         );
     }
 } 
