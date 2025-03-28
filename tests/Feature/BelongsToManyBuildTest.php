@@ -70,7 +70,7 @@ class BelongsToManyBuildTest extends TestCase
             "protected array \$with = ['properties'];",
             "BelongsToMany::make('Properties', 'properties', resource: PropertyResource::class)",
             "'title' => ['string', 'required']",
-            "'properties' => ['array', 'required']",
+            "'properties' => ['array', 'nullable']",
         ];
         foreach ($resourceStringContains as $stringContain) {
             $this->assertStringContainsString($stringContain, $resource);
@@ -117,7 +117,7 @@ class BelongsToManyBuildTest extends TestCase
             "protected array \$with = ['items'];",
             "BelongsToMany::make('Items', 'items', resource: ItemResource::class)",
             "'title' => ['string', 'required']",
-            "'items' => ['array', 'required']",
+            "'items' => ['array', 'nullable']",
         ];
         foreach ($resourceStringContains as $stringContain) {
             $this->assertStringContainsString($stringContain, $resource);
