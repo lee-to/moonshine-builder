@@ -39,6 +39,9 @@ final class TypeMap
             ->except(['Field', 'Fields', 'FormElement', 'FormElements'])
             ->toArray()
         ;
+
+        $this->fieldClasses['Markdown'] = 'MoonShine\\EasyMde\\Fields\\Markdown';
+        $this->fieldClasses['TinyMce'] = 'MoonShine\\TinyMce\\Fields\\TinyMce';
     }
 
     /**
