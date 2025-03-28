@@ -96,7 +96,15 @@ final class ColumnStructure
     public function isRequired(): bool
     {
         // If it is impossible to set the NULL field, then this field must be required
-        if(! in_array('nullable()', $this->getMigrationMethods())) {
+        $notCheckRequiredField = [
+            SqlTypeMap::HAS_MANY,
+            SqlTypeMap::HAS_ONE,
+            SqlTypeMap::BELONGS_TO_MANY,
+        ];
+        if(
+            ! in_array($this->type(), $notCheckRequiredField)
+            && ! in_array('nullable()', $this->getMigrationMethods())
+        ) {
             return true;
         }
 
