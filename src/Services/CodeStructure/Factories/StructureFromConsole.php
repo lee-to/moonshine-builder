@@ -60,8 +60,9 @@ final readonly class StructureFromConsole implements MakeStructureContract
                 }
 
                 $columnStructure->setRelation(new RelationStructure(
-                    $foreignKey,
-                    $value['relationTable'],
+                    foreignColumn: $foreignKey,
+                    modelRelationName: null,
+                    table: $value['relationTable'],
                 ));
             }
 

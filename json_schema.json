@@ -110,6 +110,9 @@
                     "table": {
                       "type": "string"
                     },
+                    "model_relation_name": {
+                      "type": "string"
+                    },
                     "foreign_key": {
                       "type": "string"
                     }

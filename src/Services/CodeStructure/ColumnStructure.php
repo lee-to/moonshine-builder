@@ -19,9 +19,6 @@ final class ColumnStructure
     /** For relation resource*/
     private ?string $resourceClass = null;
 
-    /** To set the name of the relationship method in the model*/
-    private ?string $relationName = null;
-
     private array $resourceMethods = [];
 
     private array $migrationMethods = [];
@@ -320,16 +317,6 @@ final class ColumnStructure
         $this->migrationOptions = $migrationOptions;
     }
 
-    public function getRelationName(): ?string
-    {
-        return $this->relationName;
-    }
-
-    public function setRelationName(?string $relationName): void
-    {
-        $this->relationName = $relationName;
-    }
-
     public function getCast(): ?string
     {
         return $this->cast;
@@ -348,5 +335,17 @@ final class ColumnStructure
     public function setHasFilter(bool $hasFilter): void
     {
         $this->hasFilter = $hasFilter;
+    }
+
+    public function getModelRelationName(): string
+    {
+        if($this->relation()->modelRelationName() !== null) {
+            return $this->relation()->modelRelationName();
+        } else {
+            $relation = $this->relation()->table()->str();
+            return ($this->type() === SqlTypeMap::HAS_MANY || $this->type() === SqlTypeMap::BELONGS_TO_MANY)
+                ? $relation->plural()->camel()->value()
+                : $relation->singular()->camel()->value();
+        }
     }
 }

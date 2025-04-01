@@ -121,8 +121,9 @@ final readonly class StructureFromMysql implements MakeStructureContract
 
             if($this->isBelongsTo && isset($foreignList[$column['name']])) {
                 $columnStructure->setRelation(new RelationStructure(
-                    $foreignList[$column['name']]['foreign_column'],
-                    $foreignList[$column['name']]['table']
+                    foreignColumn: $foreignList[$column['name']]['foreign_column'],
+                    modelRelationName: null,
+                    table: $foreignList[$column['name']]['table']
                 ));
             }
 
@@ -139,8 +140,9 @@ final readonly class StructureFromMysql implements MakeStructureContract
                 required: false,
             );
             $columnStructure->setRelation(new RelationStructure(
-                str($this->table)->singular()->snake()->value() . '_id',
-                $tableName
+                foreignColumn: str($this->table)->singular()->snake()->value() . '_id',
+                modelRelationName: null,
+                table: $tableName
             ));
             $codeStructure->addColumn($columnStructure);
         }
@@ -155,8 +157,9 @@ final readonly class StructureFromMysql implements MakeStructureContract
                 required: false,
             );
             $columnStructure->setRelation(new RelationStructure(
-                str($this->table)->singular()->snake()->value() . '_id',
-                $tableName,
+                foreignColumn: str($this->table)->singular()->snake()->value() . '_id',
+                modelRelationName: null,
+                table: $tableName,
             ));
             $codeStructure->addColumn($columnStructure);
         }
@@ -171,8 +174,9 @@ final readonly class StructureFromMysql implements MakeStructureContract
                 required: false,
             );
             $columnStructure->setRelation(new RelationStructure(
-                str($this->table)->singular()->snake()->value() . '_id',
-                $tableName,
+                foreignColumn: str($this->table)->singular()->snake()->value() . '_id',
+                modelRelationName: null,
+                table: $tableName,
             ));
             $codeStructure->addColumn($columnStructure);
         }

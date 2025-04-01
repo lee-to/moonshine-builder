@@ -81,10 +81,7 @@ final readonly class MoonShineStructure
                     $resourceName = str_replace('Moonshine', 'MoonShine', $resourceName);
                 }
 
-                $relationMethod = $column->relation()->table();
-                $relationMethod = $column->type() === SqlTypeMap::BELONGS_TO
-                    ? $relationMethod->singular()
-                    : $relationMethod->plural();
+                $relationMethod = $column->getModelRelationName();
 
                 $fields[] = str(class_basename($fieldClass))
                     ->append('::make')
@@ -157,13 +154,7 @@ final readonly class MoonShineStructure
             if(! $column->relation()) {
                 continue;
             }
-
-            $relationMethod = $column->relation()->table();
-            $relationMethod = $column->type() === SqlTypeMap::BELONGS_TO
-                ? $relationMethod->singular()
-                : $relationMethod->plural();
-
-            $withArray[] = $relationMethod;
+            $withArray[] = $column->getModelRelationName();
         }
 
         return $withArray;
