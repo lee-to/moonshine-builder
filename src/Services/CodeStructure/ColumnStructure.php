@@ -172,6 +172,16 @@ final class ColumnStructure
             return 'file';
         }
 
+        $floatTypes = [
+            SqlTypeMap::FLOAT,
+            SqlTypeMap::DECIMAL,
+            SqlTypeMap::DOUBLE,
+        ];
+
+        if(in_array($this->type(), $floatTypes)) {
+            return 'numeric';
+        }
+
         if($this->inputType === 'number') {
             return 'int';
         }
