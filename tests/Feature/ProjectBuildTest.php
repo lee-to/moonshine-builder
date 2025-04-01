@@ -153,8 +153,8 @@ class ProjectBuildTest extends TestCase
             "table->string('title');",
             "table->text('content')->nullable();",
             "table->unsignedInteger('price')->default(0)->index()",
-            "table->foreignIdFor(\App\Models\Category::class)\n\t\t\t\t->constrained()\n\t\t\t\t->cascadeOnDelete()\n\t\t\t\t->cascadeOnUpdate()",
-            "table->foreignIdFor(\\MoonShine\\Laravel\\Models\\MoonshineUser::class)\n\t\t\t\t->constrained()\n\t\t\t\t->cascadeOnDelete()\n\t\t\t\t->cascadeOnUpdate()",
+            "table->foreignIdFor(\App\Models\Category::class, 'category_id')\n\t\t\t\t->constrained()\n\t\t\t\t->cascadeOnDelete()\n\t\t\t\t->cascadeOnUpdate()",
+            "table->foreignIdFor(\\MoonShine\\Laravel\\Models\\MoonshineUser::class, 'moonshine_user_id')\n\t\t\t\t->constrained()\n\t\t\t\t->cascadeOnDelete()\n\t\t\t\t->cascadeOnUpdate()",
             "table->boolean('is_active')->default(0);",
             "table->timestamps();",
             "table->softDeletes();",
@@ -210,8 +210,8 @@ class ProjectBuildTest extends TestCase
         $migrationContains = [
             "Schema::create('comments', function (Blueprint \$table) {",
             "table->string('comment');",
-            "table->foreignIdFor(\App\Models\Product::class)\n\t\t\t\t->constrained()\n\t\t\t\t->cascadeOnDelete()\n\t\t\t\t->cascadeOnUpdate()",
-            "table->foreignIdFor(\\MoonShine\\Laravel\\Models\\MoonshineUser::class)\n\t\t\t\t->constrained()\n\t\t\t\t->cascadeOnDelete()\n\t\t\t\t->cascadeOnUpdate()",
+            "table->foreignIdFor(\App\Models\Product::class, 'product_id')\n\t\t\t\t->constrained()\n\t\t\t\t->cascadeOnDelete()\n\t\t\t\t->cascadeOnUpdate()",
+            "table->foreignIdFor(\\MoonShine\\Laravel\\Models\\MoonshineUser::class, 'moonshine_user_id')\n\t\t\t\t->constrained()\n\t\t\t\t->cascadeOnDelete()\n\t\t\t\t->cascadeOnUpdate()",
         ];
         foreach ($migrationContains as $stringContain) {
             $this->assertStringContainsString($stringContain, $migration);

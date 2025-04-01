@@ -45,8 +45,8 @@ class BelongsToManyBuildTest extends TestCase
         $migrationContains = [
             "Schema::create('item_property', function (Blueprint \$table) {",
             "table->id();",
-            "table->foreignIdFor(\App\Models\Item::class)\n\t\t\t\t->constrained()\n\t\t\t\t->cascadeOnDelete()\n\t\t\t\t->cascadeOnUpdate()",
-            "table->foreignIdFor(\App\Models\Property::class)\n\t\t\t\t->constrained()\n\t\t\t\t->cascadeOnDelete()\n\t\t\t\t->cascadeOnUpdate()",
+            "table->foreignIdFor(\App\Models\Item::class, 'item_id')\n\t\t\t\t->constrained()\n\t\t\t\t->cascadeOnDelete()\n\t\t\t\t->cascadeOnUpdate()",
+            "table->foreignIdFor(\App\Models\Property::class, 'property_id')\n\t\t\t\t->constrained()\n\t\t\t\t->cascadeOnDelete()\n\t\t\t\t->cascadeOnUpdate()",
         ];
         foreach ($migrationContains as $stringContain) {
             $this->assertStringContainsString($stringContain, $migration);
