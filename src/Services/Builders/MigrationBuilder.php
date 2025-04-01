@@ -64,7 +64,11 @@ class MigrationBuilder extends AbstractBuilder implements MigrationBuilderContra
                 ->prepend("\t\t\t")
                 ->prepend("\n")
                 ->append($this->migrationName($column))
-                ->append($this->migrationMethods($column))
+                ->when($column->relation() === null,
+                    // In relations fields, the methods are already substituted in migrationName,
+                    // the rest must be added
+                    fn ($str) => $str->append($this->migrationMethods($column))
+                )
                 ->append(';')
                 ->value()
             ;
@@ -112,7 +116,16 @@ class MigrationBuilder extends AbstractBuilder implements MigrationBuilderContra
                 fn ($str) => $str->append($modelName)
             )
             ->append("::class")
+            ->append(', ')
+            ->append("'{$column->column()}'")
             ->append(')')
+            ->when(
+                $column->getMigrationMethods() !== [],
+                fn($str) => $str
+                    ->newLine()
+                    ->append("\t\t\t\t")
+                    ->append($this->migrationMethods($column))
+            )
             ->newLine()
             ->append("\t\t\t\t")
             ->append('->constrained()')
