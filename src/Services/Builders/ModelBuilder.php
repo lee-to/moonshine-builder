@@ -161,15 +161,7 @@ class ModelBuilder extends AbstractBuilder implements ModelBuilderContract
                 );
             }
 
-            if($column->getRelationName()) {
-                $relation = $column->getRelationName();
-            } else {
-                $relation = $column->relation()->table()->str();
-
-                $relation = ($column->type() === SqlTypeMap::HAS_MANY || $column->type() === SqlTypeMap::BELONGS_TO_MANY)
-                    ? $relation->plural()->camel()->value()
-                    : $relation->singular()->camel()->value();
-            }
+            $relation = $column->getModelRelationName();
 
             $relationColumn = ($column->type() === SqlTypeMap::HAS_MANY || $column->type() === SqlTypeMap::HAS_ONE)
                 ? $column->relation()->foreignColumn()

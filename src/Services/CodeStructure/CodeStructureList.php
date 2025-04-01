@@ -85,7 +85,11 @@ final class CodeStructureList
                         nullable: false,
                         required: false,
                     );
-                    $field->setRelation(new RelationStructure('id', $relationColumn));
+                    $field->setRelation(new RelationStructure(
+                        foreignColumn: 'id',
+                        modelRelationName: null,
+                        table: $relationColumn
+                    ));
 
                     $findCodeStructure->addColumn($field);
                 }

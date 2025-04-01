@@ -12,6 +12,7 @@ final class RelationStructure
 
     public function __construct(
         private readonly string $foreignColumn,
+        private readonly ?string $modelRelationName,
         string $table
     ) {
         $this->table = new NameStr($table);
@@ -25,6 +26,11 @@ final class RelationStructure
     public function table(): NameStr
     {
         return $this->table;
+    }
+
+    public function modelRelationName(): ?string
+    {
+        return $this->modelRelationName;
     }
 
     public function model(): string

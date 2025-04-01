@@ -87,12 +87,9 @@ final readonly class StructureFromArray implements MakeStructureContract
 
                     $columnStructure->setRelation(new RelationStructure(
                         $field['relation']['foreign_key'],
+                        $field['relation']['model_relation_name'] ?? null,
                         $field['relation']['table'],
                     ));
-
-                    if(! empty($field['relation']['relation_name'])) {
-                        $columnStructure->setRelationName($field['relation']['relation_name']);
-                    }
                 }
 
                 if(isset($field['hasFilter'])) {
