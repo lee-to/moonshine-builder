@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace DevLnk\MoonShineBuilder\Services\CodeStructure;
 
-use DevLnk\MoonShineBuilder\Enums\SqlTypeMap;
 use DevLnk\MoonShineBuilder\Exceptions\ProjectBuilderException;
 use DevLnk\MoonShineBuilder\Support\TypeMap;
 
@@ -16,6 +15,26 @@ final readonly class MoonShineStructure
         private CodeStructure $codeStructure
     ) {
         $this->fieldMap = new TypeMap();
+    }
+
+    public function getResourceTitle(): string
+    {
+        return $this->codeStructure->menuName();
+    }
+
+    public function getColumnName(): string
+    {
+        if ($this->codeStructure->getColumnName() === null) {
+            return '';
+        }
+
+        return str('')
+            ->newLine()
+            ->newLine()
+            ->append("\t")
+            ->append("protected string \$column = '{$this->codeStructure->getColumnName()}';")
+            ->value()
+        ;
     }
 
     /**

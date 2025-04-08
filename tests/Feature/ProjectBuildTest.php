@@ -180,6 +180,8 @@ class ProjectBuildTest extends TestCase
             "use App\Models\Comment;",
             "@extends ModelResource<Comment>",
             "class CommentResource extends ModelResource",
+            "public function getTitle(): string",
+            "return 'Comment';",
             "ID::make('id')",
             "Text::make('Comment', 'comment')",
             "BelongsTo::make('Product', 'product', resource: ProductResource::class)",
