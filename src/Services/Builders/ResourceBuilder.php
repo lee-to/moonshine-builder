@@ -33,13 +33,8 @@ class ResourceBuilder extends AbstractBuilder implements ResourceBuilderContract
         StubBuilder::make($this->stubFile)
             ->setKey(
                 '{column}',
-                str('')
-                ->newLine()
-                ->newLine()
-                ->append("\t")
-                ->append("protected string \$column = '{$this->codeStructure->getColumnName()}';")
-                ->value(),
-                ! is_null($this->codeStructure->getColumnName())
+                $this->moonShineStructure->getColumnName(),
+                $this->codeStructure->getColumnName() !== null
             )
             ->setKey(
                 '{model_use}',
@@ -48,13 +43,14 @@ class ResourceBuilder extends AbstractBuilder implements ResourceBuilderContract
             ->setKey(
                 '{with_array}',
                 "\n\n\tprotected array \$with = [{with}];",
-                ! empty($withArray)
+                $withArray !== ''
             )
             ->makeFromStub($resourcePath->file(), [
                 '{namespace}' => $resourcePath->namespace(),
                 '{field_uses}' => $this->usesFieldsToResource(),
                 '{class}' => $resourcePath->rawName(),
                 '{model}' => $modelPath->rawName(),
+                '{resourceTitle}' => $this->moonShineStructure->getResourceTitle(),
                 '{with}' => $this->withArray(),
                 '{fields}' => $this->columnsToResource(),
                 '{filters}' => $this->columnsToResource(onlyFilters: true),

@@ -16,6 +16,11 @@ class {class} extends ModelResource
 {
     protected string $model = {model}::class;{column}{with_array}
 
+    public function getTitle(): string
+    {
+        return '{resourceTitle}';
+    }
+
     public function indexFields(): iterable
     {
         // TODO correct labels values
