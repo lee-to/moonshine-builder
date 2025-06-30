@@ -356,5 +356,5 @@ php artisan moonshine:build project_20240613113014.json
 ```
 
 <a name="cases"></a>
-### Использование
-На основе данного пакет работает проект [MoonVibe](https://github.com/moonshine-software/moon-vibe), который с помощью ИИ позовляет генерировать схему и создавать админ-панели прямо внутри итнтерфейса данного проекта.
+### Использование в других проектах
+- [MoonVibe](https://github.com/moonshine-software/moon-vibe) - генерации админ-панели с помощью ИИ
