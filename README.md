@@ -23,6 +23,7 @@
     - [Генерация из openapi спецификации](#openapi)
     - [Генерация из консоли](#console)
 - [Массовый импорт таблиц](#mass-sql)
+- [Использование](#cases)
 
 ---
 
@@ -353,3 +354,7 @@ php artisan moonshine:project-schema
 project_20240613113014.json was created successfully! To generate resources, run: 
 php artisan moonshine:build project_20240613113014.json
 ```
+
+<a name="cases"></a>
+### Использование
+На основе данного пакет работает проект [MoonVibe](https://github.com/moonshine-software/moon-vibe), который с помощью ИИ позовляет генерировать схему и создавать админ-панели прямо внутри итнтерфейса данного проекта.
