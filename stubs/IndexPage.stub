@@ -10,13 +10,12 @@ use MoonShine\UI\Components\Table\TableBuilder;
 use MoonShine\Contracts\UI\FieldContract;
 use MoonShine\Laravel\QueryTags\QueryTag;
 use MoonShine\UI\Components\Metrics\Wrapped\Metric;
-use App\MoonShine\Resources\{name}\{name}Resource;
+use {resource_namespace}\{resource_name};
 use MoonShine\Support\ListOf;
 use Throwable;
 {field_uses}
-
 /**
- * @extends IndexPage<{name}Resource>
+ * @extends IndexPage<{resource_name}>
  */
 class {class} extends IndexPage
 {
