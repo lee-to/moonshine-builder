@@ -61,6 +61,28 @@ final readonly class MoonShineStructure
                 ->value()
             ;
 
+            if(! is_null($column->relation())) {
+                $resourceName = str($column->relation()->table()->camel())->singular()->ucfirst()->value();
+                if(str_contains($resourceName, 'Moonshine')) {
+                    $resourceName = str_replace('Moonshine', 'MoonShine', $resourceName);
+                }
+
+                $resourceUse = str('use App\\MoonShine\\Resources\\')
+                    ->append($resourceName . '\\')
+                    ->when(
+                        $column->getResourceClass(),
+                        fn ($str) => $str->append($column->getResourceClass()),
+                        fn ($str) => $str->append(str($resourceName)->append('Resource')->value()),
+                    )
+                    ->append(';')
+                    ->value()
+                ;
+
+                if(! in_array($resourceUse, $uses)) {
+                    $uses[] = $resourceUse;
+                }
+            }
+
             if(in_array($use, $uses)) {
                 continue;
             }
@@ -106,6 +128,8 @@ final readonly class MoonShineStructure
                     ->append('::make')
                     ->append("('{$column->name()}', '$relationMethod'")
                     ->append(", resource: ")
+//                    ->append('\\App\\MoonShine\\Resources\\')
+//                    ->append($resourceName . '\\')
                     ->when(
                         $column->getResourceClass(),
                         fn ($str) => $str->append($column->getResourceClass() . '::class'),

@@ -20,7 +20,6 @@
         - [Timestamps](#timestamps)
         - [Soft delete](#soft-delete)
         - [Флаги для генерации файлов](#flags)
-    - [Генерация из openapi спецификации](#openapi)
     - [Генерация из консоли](#console)
 - [Массовый импорт таблиц](#mass-sql)
 - [Использование в других проектах](#cases)
@@ -34,7 +33,6 @@
 
  - [SQL-таблицы](#sql),
  - [JSON-схемы](#json),
- - [Openapi (beta)](#openapi)
  - [Генерация кода для нового ресурса из консоли](#console).
 
 Пакет генерирует следующие файлы:
@@ -89,7 +87,6 @@ php artisan moonshine:build
  ┌ Type ────────────────────────────────────────────────────────┐
  │   ○ table                                                    │
  │ › ● json                                                     │
- │   ○ openapi yaml (beta)                                      │
  │   ○ console                                                  │
  └──────────────────────────────────────────────────────────────┘
 ```
@@ -123,7 +120,6 @@ INFO  All done.
  ┌ Type ────────────────────────────────────────────────────────┐
  │ › ● table                                                    │
  │   ○ json                                                     │
- │   ○ openapi yaml (beta)                                      │
  │   ○ console                                                  │
  └──────────────────────────────────────────────────────────────┘
 ```
@@ -243,35 +239,6 @@ php artisan moonshine:build category.json
   "withResource": false,
   "withModel": false
 }
-```
-
-<a name="openapi"></a>
-### Генерация из Openapi схемы (yaml)
-Данная функция находится в разработке, но вы уже можете сформировать данные из своей openapi спецификации в формате yaml. Для этого вам необходимо в секции path, после указания HTTP метода, указать tag <name>Resource, например:
-```yaml
-paths:
-    /api/users:
-        get:
-            summary: Get all users
-            operationId: listUsers
-            responses:
-                '200':
-                    description: A list of users
-        post:
-            tags: [userResource]
-        #...
-```
-
-Одинаковый tag можно использовать в разных paths одной сущности, это позволит собрать дополнительные поля для вашего ресурса. Например:
-```yaml
-paths:
-    /api/users:
-        post:
-          tags: [userResource]
-          #...
-        put:
-          tags: [userResource]
-        #...
 ```
 
 <a name="console"></a>

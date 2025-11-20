@@ -47,64 +47,12 @@ class ResourceBuilder extends AbstractBuilder implements ResourceBuilderContract
             )
             ->makeFromStub($resourcePath->file(), [
                 '{namespace}' => $resourcePath->namespace(),
-                '{field_uses}' => $this->usesFieldsToResource(),
                 '{class}' => $resourcePath->rawName(),
                 '{model}' => $modelPath->rawName(),
+                '{name}' => str_replace('Resource', '', $resourcePath->rawName()),
                 '{resourceTitle}' => $this->moonShineStructure->getResourceTitle(),
                 '{with}' => $this->withArray(),
-                '{fields}' => $this->columnsToResource(),
-                '{filters}' => $this->columnsToResource(onlyFilters: true),
-                '{rules}' => $this->columnsToRules(),
             ]);
-    }
-
-    /**
-     * @throws ProjectBuilderException
-     */
-    protected function usesFieldsToResource(): string
-    {
-        $result = "";
-
-        foreach ($this->moonShineStructure->getUsesForFields() as $use) {
-            $result .= str($use)->newLine()->value();
-        }
-
-        return $result;
-    }
-
-    /**
-     * @throws ProjectBuilderException
-     */
-    protected function columnsToResource(bool $onlyFilters = false): string
-    {
-        $result = "";
-
-        foreach ($this->moonShineStructure->getFields(tabulation: 4, onlyFilters: $onlyFilters) as $field) {
-            $result .= str($field)
-                ->prepend("\t\t\t")
-                ->prepend("\n")
-                ->append(',')
-                ->value()
-            ;
-        }
-
-        return $result;
-    }
-
-    public function columnsToRules(): string
-    {
-        $result = "";
-
-        foreach ($this->moonShineStructure->getRules() as $rule) {
-            $result .= str($rule)
-                ->prepend("\t\t\t")
-                ->prepend("\n")
-                ->append(',')
-                ->value()
-            ;
-        }
-
-        return $result;
     }
 
     public function withArray(): string

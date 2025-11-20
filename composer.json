@@ -18,11 +18,11 @@
         "phpunit/phpunit": "^11.0",
         "orchestra/testbench": "^9.0",
         "phpstan/phpstan": "^1.11",
-        "moonshine/moonshine": "^3.0",
+        "moonshine/moonshine": "^4.0",
         "symfony/yaml": "^7.2"
     },
     "conflict": {
-        "moonshine/moonshine": "<3.0"
+        "moonshine/moonshine": "<4.0"
     },
     "autoload": {
         "psr-4": {
@@ -40,7 +40,7 @@
         }
     },
     "scripts": {
-        "test": "vendor/bin/phpstan analyse -c phpstan.neon && vendor/bin/phpunit"
+        "test": "php -d memory_limit=-1 vendor/bin/phpstan analyse -c phpstan.neon && vendor/bin/phpunit"
     },
     "extra": {
         "laravel": {

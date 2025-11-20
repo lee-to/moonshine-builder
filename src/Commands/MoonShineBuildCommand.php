@@ -101,7 +101,10 @@ class MoonShineBuildCommand extends MoonShineCommand
         $validBuilders = array_filter([
             $codeStructure->withModel() ? BuildType::MODEL : null,
             $codeStructure->withMigration() ? BuildType::MIGRATION : null, 
-            $codeStructure->withResource() ? BuildType::RESOURCE : null
+            $codeStructure->withResource() ? BuildType::RESOURCE : null,
+            BuildType::INDEX_PAGE,
+            BuildType::FORM_PAGE,
+            BuildType::DETAIL_PAGE,
         ]);
 
         foreach ($this->builders as $builder) {
@@ -139,17 +142,19 @@ class MoonShineBuildCommand extends MoonShineCommand
 
             $this->reminderResourceInfo[] = "{$resourcePath->rawName()}::class,";
 
+            $entityName = str_replace('Resource', '', $resourcePath->rawName());
+
             $this->reminderMenuInfo[] = StubBuilder::make($this->stubDir . 'MenuItem')
                 ->getFromStub([
                     '{menuName}' => $codeStructure->menuName(),
-                    '{resource}' => '\\App\\MoonShine\\Resources\\' . $resourcePath->rawName(),
+                    '{resource}' => '\\App\\MoonShine\\Resources\\' . $entityName . '\\' . $resourcePath->rawName(),
                 ])
             ;
 
             $this->resourceInfo[] = [
                 'className' => $resourcePath->rawName(),
                 'menuName' => $codeStructure->menuName(),
-                'namespace' => 'App\\MoonShine\\Resources\\'
+                'namespace' => 'App\\MoonShine\\Resources\\' . $entityName . '\\',
             ];
         }
     }
@@ -166,9 +171,9 @@ class MoonShineBuildCommand extends MoonShineCommand
             $target = $this->getFileList('json');
         }
         
-        if (is_null($target) && $this->parseType === ParseType::OPENAPI) {
-            $target = $this->getFileList('yaml');
-        }
+//        if (is_null($target) && $this->parseType === ParseType::OPENAPI) {
+//            $target = $this->getFileList('yaml');
+//        }
 
         if($this->parseType === ParseType::TABLE) {
             $target = select(
@@ -341,6 +346,9 @@ class MoonShineBuildCommand extends MoonShineCommand
             BuildType::MODEL,
             BuildType::RESOURCE,
             BuildType::MIGRATION,
+            BuildType::INDEX_PAGE,
+            BuildType::FORM_PAGE,
+            BuildType::DETAIL_PAGE,
         ];
     }
 }
