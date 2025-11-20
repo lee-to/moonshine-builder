@@ -10,7 +10,7 @@ enum ParseType: string
 
     case JSON = 'json';
 
-    case OPENAPI = 'openapi';
+    //case OPENAPI = 'openapi';
 
     case CONSOLE = 'console';
 
@@ -20,7 +20,7 @@ enum ParseType: string
             self::TABLE => 'table',
             self::JSON => 'json',
             self::CONSOLE => 'console',
-            self::OPENAPI => 'openapi yaml (beta)',
+            //self::OPENAPI => 'openapi yaml (beta)',
         };
     }
 }

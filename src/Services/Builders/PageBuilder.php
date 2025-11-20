@@ -11,6 +11,15 @@ abstract class PageBuilder extends AbstractBuilder
 {
     private ?MoonShineStructure $moonShineStructure = null;
 
+    private function getMoonshineStructure(): MoonShineStructure
+    {
+        if($this->moonShineStructure === null) {
+            $this->moonShineStructure = new MoonShineStructure($this->codeStructure);
+        }
+
+        return $this->moonShineStructure;
+    }
+
     /**
      * @throws ProjectBuilderException
      */
@@ -58,14 +67,5 @@ abstract class PageBuilder extends AbstractBuilder
         }
 
         return $result;
-    }
-
-    private function getMoonshineStructure(): MoonShineStructure
-    {
-        if($this->moonShineStructure === null) {
-            $this->moonShineStructure = new MoonShineStructure($this->codeStructure);
-        }
-
-        return $this->moonShineStructure;
     }
 }

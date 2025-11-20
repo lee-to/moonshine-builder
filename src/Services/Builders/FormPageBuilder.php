@@ -7,15 +7,15 @@ namespace DevLnk\MoonShineBuilder\Services\Builders;
 use DevLnk\MoonShineBuilder\Enums\BuildType;
 use DevLnk\MoonShineBuilder\Exceptions\ProjectBuilderException;
 use DevLnk\MoonShineBuilder\Services\Builders\Contracts\FormPageBuilderContract;
-use DevLnk\MoonShineBuilder\Services\Builders\Contracts\ResourceBuilderContract;
-use DevLnk\MoonShineBuilder\Services\CodeStructure\MoonShineStructure;
 use DevLnk\MoonShineBuilder\Services\StubBuilder;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
 
 class FormPageBuilder extends PageBuilder implements FormPageBuilderContract
 {
-    private MoonShineStructure $moonShineStructure;
-
+    /**
+     * @throws FileNotFoundException
+     * @throws ProjectBuilderException
+     */
     public function build(): void
     {
         $pagePath = $this->codePath->path(BuildType::FORM_PAGE->value);
