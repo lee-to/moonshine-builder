@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\MoonShine\Resources\Post;
+namespace {namespace};
 
 use App\Models\{model};
 use App\MoonShine\Resources\{name}\Pages\{name}IndexPage;
