@@ -8,9 +8,15 @@ use DevLnk\MoonShineBuilder\Commands\MoonShineBuildCommand;
 use DevLnk\MoonShineBuilder\Commands\MoonShineProjectSchemaCommand;
 use DevLnk\MoonShineBuilder\Commands\ResourceBuildCommand;
 use DevLnk\MoonShineBuilder\Commands\TypeCommand;
+use DevLnk\MoonShineBuilder\Services\Builders\Contracts\DetailPageBuilderContract;
+use DevLnk\MoonShineBuilder\Services\Builders\Contracts\FormPageBuilderContract;
+use DevLnk\MoonShineBuilder\Services\Builders\Contracts\IndexPageBuilderContract;
 use DevLnk\MoonShineBuilder\Services\Builders\Contracts\MigrationBuilderContract;
 use DevLnk\MoonShineBuilder\Services\Builders\Contracts\ModelBuilderContract;
 use DevLnk\MoonShineBuilder\Services\Builders\Contracts\ResourceBuilderContract;
+use DevLnk\MoonShineBuilder\Services\Builders\DetailPageBuilder;
+use DevLnk\MoonShineBuilder\Services\Builders\FormPageBuilder;
+use DevLnk\MoonShineBuilder\Services\Builders\IndexPageBuilder;
 use DevLnk\MoonShineBuilder\Services\Builders\MigrationBuilder;
 use DevLnk\MoonShineBuilder\Services\Builders\ModelBuilder;
 use DevLnk\MoonShineBuilder\Services\Builders\ResourceBuilder;
@@ -30,6 +36,9 @@ class MoonShineBuilderProvider extends ServiceProvider
         $this->app->bind(ModelBuilderContract::class, ModelBuilder::class);
         $this->app->bind(ResourceBuilderContract::class, ResourceBuilder::class);
         $this->app->bind(MigrationBuilderContract::class, MigrationBuilder::class);
+        $this->app->bind(IndexPageBuilderContract::class, IndexPageBuilder::class);
+        $this->app->bind(FormPageBuilderContract::class, FormPageBuilder::class);
+        $this->app->bind(DetailPageBuilderContract::class, DetailPageBuilder::class);
     }
 
     public function boot(): void

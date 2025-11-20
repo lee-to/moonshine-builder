@@ -7,9 +7,13 @@ namespace DevLnk\MoonShineBuilder\Services\Builders\Factory;
 use DevLnk\MoonShineBuilder\Exceptions\NotFoundBuilderException;
 use DevLnk\MoonShineBuilder\Services\Builders\AbstractBuilder;
 use DevLnk\MoonShineBuilder\Enums\BuildType;
+use DevLnk\MoonShineBuilder\Services\Builders\Contracts\DetailPageBuilderContract;
+use DevLnk\MoonShineBuilder\Services\Builders\Contracts\FormPageBuilderContract;
+use DevLnk\MoonShineBuilder\Services\Builders\Contracts\IndexPageBuilderContract;
 use DevLnk\MoonShineBuilder\Services\Builders\Contracts\MigrationBuilderContract;
 use DevLnk\MoonShineBuilder\Services\Builders\Contracts\ModelBuilderContract;
 use DevLnk\MoonShineBuilder\Services\Builders\Contracts\ResourceBuilderContract;
+use MoonShine\Crud\Contracts\Page\IndexPageContract;
 
 final readonly class MoonShineBuildFactory extends AbstractBuildFactory
 {
@@ -38,6 +42,18 @@ final readonly class MoonShineBuildFactory extends AbstractBuildFactory
             ),
             BuildType::MIGRATION->value => app(
                 MigrationBuilderContract::class,
+                $classParameters
+            ),
+            BuildType::INDEX_PAGE->value => app(
+                IndexPageBuilderContract::class,
+                $classParameters
+            ),
+            BuildType::FORM_PAGE->value => app(
+                FormPageBuilderContract::class,
+                $classParameters
+            ),
+            BuildType::DETAIL_PAGE->value => app(
+                DetailPageBuilderContract::class,
                 $classParameters
             ),
             default => throw new NotFoundBuilderException()

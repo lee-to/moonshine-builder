@@ -101,7 +101,10 @@ class MoonShineBuildCommand extends MoonShineCommand
         $validBuilders = array_filter([
             $codeStructure->withModel() ? BuildType::MODEL : null,
             $codeStructure->withMigration() ? BuildType::MIGRATION : null, 
-            $codeStructure->withResource() ? BuildType::RESOURCE : null
+            $codeStructure->withResource() ? BuildType::RESOURCE : null,
+            BuildType::INDEX_PAGE,
+            BuildType::FORM_PAGE,
+            BuildType::DETAIL_PAGE,
         ]);
 
         foreach ($this->builders as $builder) {
@@ -341,6 +344,9 @@ class MoonShineBuildCommand extends MoonShineCommand
             BuildType::MODEL,
             BuildType::RESOURCE,
             BuildType::MIGRATION,
+            BuildType::INDEX_PAGE,
+            BuildType::FORM_PAGE,
+            BuildType::DETAIL_PAGE,
         ];
     }
 }

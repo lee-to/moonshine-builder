@@ -6,6 +6,9 @@ namespace DevLnk\MoonShineBuilder\Services\CodePath;
 
 use Carbon\Carbon;
 use DevLnk\MoonShineBuilder\Exceptions\NotFoundCodePathException;
+use DevLnk\MoonShineBuilder\Services\CodePath\MoonShine\DetailPagePath;
+use DevLnk\MoonShineBuilder\Services\CodePath\MoonShine\FormPagePath;
+use DevLnk\MoonShineBuilder\Services\CodePath\MoonShine\IndexPagePath;
 use DevLnk\MoonShineBuilder\Services\CodePath\MoonShine\MigrationPath;
 use DevLnk\MoonShineBuilder\Services\CodePath\MoonShine\ModelPath;
 use DevLnk\MoonShineBuilder\Services\CodePath\MoonShine\ResourcePath;
@@ -28,19 +31,42 @@ class MoonShineCodePath implements CodePathContract
         $time = Carbon::now();
         $time->addSeconds($this->iteration);
 
+        $name = $codeStructure->entity()->ucFirstSingular();
+        
         $this
             ->setPath(
                 new ModelPath(
-                    $codeStructure->entity()->ucFirstSingular() . '.php',
+                    $name . '.php',
                     app_path('Models'),
                     'App\\Models'
                 )
             )
             ->setPath(
                 new ResourcePath(
-                    $codeStructure->entity()->ucFirstSingular() . 'Resource.php',
-                    app_path('MoonShine/Resources'),
-                    'App\\MoonShine\\Resources'
+                    $name . 'Resource.php',
+                    app_path('MoonShine/Resources/' . $name),
+                    'App\\MoonShine\\Resources\\' . $name
+                )
+            )
+            ->setPath(
+                new IndexPagePath(
+                    $name . 'IndexPage.php',
+                    app_path('MoonShine/Resources/' . $name . '/Pages'),
+                    'App\\MoonShine\\Resources\\' . $name . '\\Pages'
+                )
+            )
+            ->setPath(
+                new FormPagePath(
+                    $name . 'FormPage.php',
+                    app_path('MoonShine/Resources/' . $name . '/Pages'),
+                    'App\\MoonShine\\Resources\\' . $name . '\\Pages'
+                )
+            )
+            ->setPath(
+                new DetailPagePath(
+                    $name . 'DetailPage.php',
+                    app_path('MoonShine/Resources/' . $name . '/Pages'),
+                    'App\\MoonShine\\Resources\\' . $name . '\\Pages'
                 )
             )
             ->setPath(
