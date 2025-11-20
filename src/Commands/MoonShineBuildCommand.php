@@ -171,9 +171,9 @@ class MoonShineBuildCommand extends MoonShineCommand
             $target = $this->getFileList('json');
         }
         
-        if (is_null($target) && $this->parseType === ParseType::OPENAPI) {
-            $target = $this->getFileList('yaml');
-        }
+//        if (is_null($target) && $this->parseType === ParseType::OPENAPI) {
+//            $target = $this->getFileList('yaml');
+//        }
 
         if($this->parseType === ParseType::TABLE) {
             $target = select(
