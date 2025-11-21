@@ -145,7 +145,10 @@ php artisan moonshine:build users --type=table
 
 Результат:
 ```php
-public function indexFields(): iterable
+/**
+ * @return list<ComponentContract|FieldContract>
+ */
+protected function fields(): iterable
 {
     return [
         ID::make('id'),
@@ -154,22 +157,6 @@ public function indexFields(): iterable
         Date::make('email_verified_at', 'email_verified_at'),
         Text::make('password', 'password'),
         Text::make('remember_token', 'remember_token'),
-    ];
-}
-
-public function formFields(): iterable
-{
-    return [
-        Box::make([
-            ...$this->indexFields()
-        ])
-    ];
-}
-
-public function detailFields(): iterable
-{
-    return [
-        ...$this->indexFields()
     ];
 }
 ```
@@ -281,7 +268,10 @@ php artisan moonshine:build-resource Status id:Id:id name:Name:string
 
 Результат:
 ```php
-public function indexFields(): iterable
+/**
+ * @return list<ComponentContract|FieldContract>
+ */
+protected function fields(): iterable
 {
     return [
         ID::make('id'),
