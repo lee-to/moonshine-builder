@@ -37,9 +37,12 @@
 
 Пакет генерирует следующие файлы:
 
- - [Resource](https://github.com/dev-lnk/moonshine-builder/blob/master/.github/entities/resource.md)
- - [Model](https://github.com/dev-lnk/moonshine-builder/blob/master/.github/entities/model.md)
- - [Migration](https://github.com/dev-lnk/moonshine-builder/blob/master/.github/entities/migration.md)
+ - [Resource](https://github.com/dev-lnk/moonshine-builder/blob/3.x/.github/entities/resource.md)
+ - [IndexPage](https://github.com/dev-lnk/moonshine-builder/blob/3.x/.github/entities/index-page.md)
+ - [FormPage](https://github.com/dev-lnk/moonshine-builder/blob/3.x/.github/entities/form-page.md)
+ - [DetailPage](https://github.com/dev-lnk/moonshine-builder/blob/3.x/.github/entities/detail-page.md)
+ - [Model](https://github.com/dev-lnk/moonshine-builder/blob/3.x/.github/entities/model.md)
+ - [Migration](https://github.com/dev-lnk/moonshine-builder/blob/3.x/.github/entities/migration.md)
 
 
 <a name="install"></a>
