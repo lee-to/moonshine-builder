@@ -62,24 +62,23 @@ final readonly class MoonShineStructure
             ;
 
             if(! is_null($column->relation())) {
-                $resourceName = str($column->relation()->table()->camel())->singular()->ucfirst()->value();
-                if(str_contains($resourceName, 'Moonshine')) {
-                    $resourceName = str_replace('Moonshine', 'MoonShine', $resourceName);
-                }
-
-                $resourceUse = str('use App\\MoonShine\\Resources\\')
-                    ->append($resourceName . '\\')
-                    ->when(
-                        $column->getResourceClass(),
-                        fn ($str) => $str->append($column->getResourceClass()),
-                        fn ($str) => $str->append(str($resourceName)->append('Resource')->value()),
-                    )
-                    ->append(';')
-                    ->value()
-                ;
-
-                if(! in_array($resourceUse, $uses)) {
-                    $uses[] = $resourceUse;
+                $relationResourceName = str($column->relation()->table()->camel())->singular()->ucfirst()->value();
+                if($relationResourceName !== $this->codeStructure->entity()->ucFirstSingular()) {
+                    if(str_contains($relationResourceName, 'Moonshine')) {
+                        $relationResourceName = str_replace('Moonshine', 'MoonShine', $relationResourceName);
+                    }
+                    $resourceUse = str('use App\\MoonShine\\Resources\\')
+                        ->append($relationResourceName . '\\')
+                        ->when(
+                            $column->getResourceClass(),
+                            fn ($str) => $str->append($column->getResourceClass()),
+                            fn ($str) => $str->append(str($relationResourceName)->append('Resource')->value()),
+                        )
+                        ->append(';')
+                        ->value();
+                    if(! in_array($resourceUse, $uses)) {
+                        $uses[] = $resourceUse;
+                    }
                 }
             }
 
