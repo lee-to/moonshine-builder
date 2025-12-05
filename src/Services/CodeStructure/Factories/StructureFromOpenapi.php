@@ -115,7 +115,7 @@ final readonly class StructureFromOpenapi implements MakeStructureContract
                             }
                         } elseif (isset($schema['properties']) && is_array($schema['properties'])) {
                             foreach ($schema['properties'] as $prop => $schemaDef) {
-                                $propType  = $schemaDef['type'] ?? 'string';
+                                $propType = $schemaDef['type'] ?? 'string';
                                 $column = $this->makeColumn(
                                     column: $prop,
                                     propertyType: $propType
@@ -132,12 +132,13 @@ final readonly class StructureFromOpenapi implements MakeStructureContract
         foreach ($resources as $codeStructure) {
             $validateId = false;
             foreach ($codeStructure->columns() as $columnStructure) {
-                if($columnStructure->isId()) {
+                if ($columnStructure->isId()) {
                     $validateId = true;
                 }
             }
-            if(! $validateId) {
-                $codeStructure->addColumn(new ColumnStructure(
+            if (! $validateId) {
+                $codeStructure->addColumn(
+                    new ColumnStructure(
                         'id',
                         'id',
                         SqlTypeMap::ID,
@@ -156,7 +157,7 @@ final readonly class StructureFromOpenapi implements MakeStructureContract
 
     private function resolveRefColumns(string $refPath, array $components): array
     {
-        $split  = explode('/', $refPath);
+        $split = explode('/', $refPath);
         $schema = end($split);
 
         if (! isset($components[$schema]['properties'])
@@ -182,7 +183,7 @@ final readonly class StructureFromOpenapi implements MakeStructureContract
             default => SqlTypeMap::STRING
         };
 
-        if($column === 'id') {
+        if ($column === 'id') {
             $sqlTypeMap = SqlTypeMap::ID;
         }
 
@@ -195,4 +196,4 @@ final readonly class StructureFromOpenapi implements MakeStructureContract
             required: false,
         );
     }
-} 
+}

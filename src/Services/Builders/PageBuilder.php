@@ -13,7 +13,7 @@ abstract class PageBuilder extends AbstractBuilder
 
     private function getMoonshineStructure(): MoonShineStructure
     {
-        if($this->moonShineStructure === null) {
+        if ($this->moonShineStructure === null) {
             $this->moonShineStructure = new MoonShineStructure($this->codeStructure);
         }
 

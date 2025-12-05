@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace DevLnk\MoonShineBuilder\Commands;
 
+use DevLnk\MoonShineBuilder\Enums\BuildType;
 use DevLnk\MoonShineBuilder\Enums\BuildTypeContract;
 use DevLnk\MoonShineBuilder\Enums\ParseType;
-use DevLnk\MoonShineBuilder\Enums\BuildType;
 use DevLnk\MoonShineBuilder\Exceptions\CodeGenerateCommandException;
 use DevLnk\MoonShineBuilder\Exceptions\NotFoundBuilderException;
 use DevLnk\MoonShineBuilder\Exceptions\ProjectBuilderException;
@@ -21,10 +21,11 @@ use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Schema;
-use MoonShine\Laravel\Commands\MoonShineCommand;
-use SplFileInfo;
 
 use function Laravel\Prompts\{confirm, note, select};
+
+use MoonShine\Laravel\Commands\MoonShineCommand;
+use SplFileInfo;
 
 class MoonShineBuildCommand extends MoonShineCommand
 {
@@ -62,8 +63,9 @@ class MoonShineBuildCommand extends MoonShineCommand
 
         $this->parseType = ParseType::from($this->getType($target));
 
-        if($this->parseType === ParseType::CONSOLE) {
+        if ($this->parseType === ParseType::CONSOLE) {
             $this->call('moonshine:build-resource');
+
             return self::SUCCESS;
         }
 
@@ -100,7 +102,7 @@ class MoonShineBuildCommand extends MoonShineCommand
 
         $validBuilders = array_filter([
             $codeStructure->withModel() ? BuildType::MODEL : null,
-            $codeStructure->withMigration() ? BuildType::MIGRATION : null, 
+            $codeStructure->withMigration() ? BuildType::MIGRATION : null,
             $codeStructure->withResource() ? BuildType::RESOURCE : null,
             BuildType::INDEX_PAGE,
             BuildType::FORM_PAGE,
@@ -108,23 +110,23 @@ class MoonShineBuildCommand extends MoonShineCommand
         ]);
 
         foreach ($this->builders as $builder) {
-            if(! $builder instanceof BuildTypeContract) {
+            if (! $builder instanceof BuildTypeContract) {
                 throw new CodeGenerateCommandException('builder is not BuildTypeContract');
             }
 
-            if(! in_array($builder, $validBuilders)) {
+            if (! in_array($builder, $validBuilders)) {
                 continue;
             }
 
             $confirmed = true;
-            if(
+            if (
                 config('moonshine_builder.is_confirm_replace_files', true)
                 && isset($this->replaceCautions[$builder->value()])
             ) {
                 $confirmed = confirm($this->replaceCautions[$builder->value()]);
             }
 
-            if(! $confirmed) {
+            if (! $confirmed) {
                 continue;
             }
 
@@ -133,11 +135,11 @@ class MoonShineBuildCommand extends MoonShineCommand
             $this->info($this->projectFileName($filePath) . ' was created successfully!');
         }
 
-        if(! in_array(BuildType::RESOURCE, $this->builders)) {
+        if (! in_array(BuildType::RESOURCE, $this->builders)) {
             return;
         }
 
-        if($codeStructure->withResource()) {
+        if ($codeStructure->withResource()) {
             $resourcePath = $codePath->path(BuildType::RESOURCE->value);
 
             $this->reminderResourceInfo[] = "{$resourcePath->rawName()}::class,";
@@ -170,12 +172,12 @@ class MoonShineBuildCommand extends MoonShineCommand
         if (is_null($target) && $this->parseType === ParseType::JSON) {
             $target = $this->getFileList('json');
         }
-        
-//        if (is_null($target) && $this->parseType === ParseType::OPENAPI) {
-//            $target = $this->getFileList('yaml');
-//        }
 
-        if($this->parseType === ParseType::TABLE) {
+        //        if (is_null($target) && $this->parseType === ParseType::OPENAPI) {
+        //            $target = $this->getFileList('yaml');
+        //        }
+
+        if ($this->parseType === ParseType::TABLE) {
             $target = select(
                 'Table',
                 collect(Schema::getTables())
@@ -197,9 +199,10 @@ class MoonShineBuildCommand extends MoonShineCommand
         /** @var Collection<array-key, string> $files */
         $files = collect(File::files(config('moonshine_builder.builds_dir')))->mapWithKeys(
             static function (SplFileInfo $file) use ($extension): array {
-                if(! str_contains($file->getFilename(), '.' . $extension)) {
+                if (! str_contains($file->getFilename(), '.' . $extension)) {
                     return [];
                 }
+
                 return [
                     $file->getFilename() => $file->getFilename(),
                 ];
@@ -234,9 +237,9 @@ class MoonShineBuildCommand extends MoonShineCommand
 
         $fileSystem = new Filesystem();
 
-        if($isGenerationDir) {
+        if ($isGenerationDir) {
             $genPath = base_path($generationPath);
-            if(! $fileSystem->isDirectory($genPath)) {
+            if (! $fileSystem->isDirectory($genPath)) {
                 $fileSystem->makeDirectory($genPath, recursive: true);
                 $fileSystem->put($genPath . '/.gitignore', "*\n!.gitignore");
             }
@@ -244,9 +247,9 @@ class MoonShineBuildCommand extends MoonShineCommand
 
         $codePath->initPaths($codeStructure, $generationPath, $isGenerationDir);
 
-        if(! $isGenerationDir) {
+        if (! $isGenerationDir) {
             foreach ($this->builders as $buildType) {
-                if($fileSystem->isFile($codePath->path($buildType->value())->file())) {
+                if ($fileSystem->isFile($codePath->path($buildType->value())->file())) {
                     $this->replaceCautions[$buildType->value()] =
                         $this->projectFileName($codePath->path($buildType->value())->file()) . " already exists, are you sure you want to replace it?";
                 }
@@ -256,11 +259,11 @@ class MoonShineBuildCommand extends MoonShineCommand
 
     protected function projectFileName(string $filePath): string
     {
-        if(str_contains($filePath, '/resources/views')) {
+        if (str_contains($filePath, '/resources/views')) {
             return substr($filePath, strpos($filePath, '/resources/views') + 1);
         }
 
-        if(str_contains($filePath, '/routes')) {
+        if (str_contains($filePath, '/routes')) {
             return substr($filePath, strpos($filePath, '/routes') + 1);
         }
 
@@ -303,7 +306,7 @@ class MoonShineBuildCommand extends MoonShineCommand
 
     protected function resourceInfo(): void
     {
-        if(! in_array(BuildType::RESOURCE, $this->builders)) {
+        if (! in_array(BuildType::RESOURCE, $this->builders)) {
             return;
         }
 
@@ -321,7 +324,7 @@ class MoonShineBuildCommand extends MoonShineCommand
             note("Do not forget to add Resources to the menu:");
             $code = implode(PHP_EOL, $this->reminderMenuInfo);
             note($code);
-        } else if (! app()->runningUnitTests()) {
+        } elseif (! app()->runningUnitTests()) {
             // TODO Не работает в тестовой среде из-за метода addResourceOrPageToMenu
             // new ReflectionClass(moonshineConfig()->getLayout()) выбрасывает исключение
             foreach ($this->resourceInfo as $info) {

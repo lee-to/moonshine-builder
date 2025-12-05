@@ -22,7 +22,7 @@ abstract readonly class AbstractPathItem implements CodePathItemContract
 
     public function dir(): string
     {
-        if(! is_dir($this->dir)) {
+        if (! is_dir($this->dir)) {
             mkdir($this->dir, recursive: true);
         }
 

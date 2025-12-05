@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace DevLnk\MoonShineBuilder\Traits;
 
+use DevLnk\MoonShineBuilder\Enums\BuildType;
 use DevLnk\MoonShineBuilder\Services\Builders\Factory\AbstractBuildFactory;
+use DevLnk\MoonShineBuilder\Services\Builders\Factory\MoonShineBuildFactory;
 use DevLnk\MoonShineBuilder\Services\CodePath\CodePathContract;
 use DevLnk\MoonShineBuilder\Services\CodeStructure\CodeStructure;
-use DevLnk\MoonShineBuilder\Enums\BuildType;
-use DevLnk\MoonShineBuilder\Services\Builders\Factory\MoonShineBuildFactory;
 
 trait CommandVariables
 {

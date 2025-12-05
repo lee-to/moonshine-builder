@@ -6,9 +6,9 @@ namespace DevLnk\MoonShineBuilder\Services\CodeStructure\Factories;
 
 use DevLnk\MoonShineBuilder\Enums\SqlTypeMap;
 use DevLnk\MoonShineBuilder\Services\CodeStructure\CodeStructure;
+use DevLnk\MoonShineBuilder\Services\CodeStructure\CodeStructureList;
 use DevLnk\MoonShineBuilder\Services\CodeStructure\ColumnStructure;
 use DevLnk\MoonShineBuilder\Services\CodeStructure\RelationStructure;
-use DevLnk\MoonShineBuilder\Services\CodeStructure\CodeStructureList;
 
 final readonly class StructureFromConsole implements MakeStructureContract
 {
@@ -17,7 +17,6 @@ final readonly class StructureFromConsole implements MakeStructureContract
 
         /** @var array<int, array{column: string, name:string, type:string, relationTable:string}> */
         private array $fieldValues,
-
         private bool $isMigration = false,
         private bool $isTimestamps = false,
         private bool $isSoftDelete = false,

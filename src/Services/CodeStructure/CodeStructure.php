@@ -97,12 +97,13 @@ class CodeStructure
 
     public function addColumn(ColumnStructure $column): void
     {
-        if(in_array($column, $this->columns)) {
+        if (in_array($column, $this->columns)) {
             return;
         }
 
         if ($column->isId()) {
             array_unshift($this->columns, $column);
+
             return;
         }
 
@@ -110,38 +111,38 @@ class CodeStructure
 
         $this->setTimestamps($column);
 
-        if($column->type() === SqlTypeMap::BELONGS_TO) {
+        if ($column->type() === SqlTypeMap::BELONGS_TO) {
             $this->hasBelongsTo = true;
         }
 
-        if($column->type() === SqlTypeMap::HAS_MANY) {
+        if ($column->type() === SqlTypeMap::HAS_MANY) {
             $this->hasHasMany = true;
         }
 
-        if($column->type() === SqlTypeMap::HAS_ONE) {
+        if ($column->type() === SqlTypeMap::HAS_ONE) {
             $this->hasHasOne = true;
         }
 
-        if($column->type() === SqlTypeMap::BELONGS_TO_MANY) {
+        if ($column->type() === SqlTypeMap::BELONGS_TO_MANY) {
             $this->hasBelongsToMany = true;
         }
     }
 
     private function setTimestamps(ColumnStructure $column): void
     {
-        if(! $this->isCreatedAt && $column->isCreatedAt()) {
+        if (! $this->isCreatedAt && $column->isCreatedAt()) {
             $this->isCreatedAt = true;
 
             return;
         }
 
-        if(! $this->isUpdatedAt && $column->isUpdatedAt()) {
+        if (! $this->isUpdatedAt && $column->isUpdatedAt()) {
             $this->isUpdatedAt = true;
 
             return;
         }
 
-        if(! $this->isDeletedAt && $column->isDeletedAt()) {
+        if (! $this->isDeletedAt && $column->isDeletedAt()) {
             $this->isDeletedAt = true;
         }
     }

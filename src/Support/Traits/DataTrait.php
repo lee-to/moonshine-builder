@@ -18,7 +18,7 @@ trait DataTrait
 
     public function setDataValue(mixed $key, mixed $value): void
     {
-        if(isset($this->data[$key])) {
+        if (isset($this->data[$key])) {
             return;
         }
         $this->data[$key] = $value;

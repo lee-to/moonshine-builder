@@ -74,7 +74,7 @@ class MoonShineProjectSchemaCommand extends Command
 
         $fileSystem = new FileSystem();
 
-        if(!$fileSystem->exists($dir)){
+        if (! $fileSystem->exists($dir)) {
             $fileSystem->makeDirectory($dir, 0777, true);
         }
 

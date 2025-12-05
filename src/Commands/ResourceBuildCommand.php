@@ -6,8 +6,8 @@ namespace DevLnk\MoonShineBuilder\Commands;
 
 use DevLnk\MoonShineBuilder\Enums\SqlTypeMap;
 use DevLnk\MoonShineBuilder\Exceptions\ProjectBuilderException;
-
 use DevLnk\MoonShineBuilder\Services\CodeStructure\Factories\StructureFromConsole;
+
 use function Laravel\Prompts\{confirm, search, text};
 
 use ValueError;
@@ -23,7 +23,7 @@ class ResourceBuildCommand extends MoonShineBuildCommand
         $this->prepareBuilders();
 
         $entity = $this->argument('entity');
-        if(empty($entity)) {
+        if (empty($entity)) {
             $entity = text('Resource name:');
         }
 

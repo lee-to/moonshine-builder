@@ -37,7 +37,7 @@ final class ColumnStructure
         private readonly bool $nullable,
         private readonly bool $required,
     ) {
-        if(empty($this->name)) {
+        if (empty($this->name)) {
             $this->name = str($this->column)->camel()->ucfirst()->value();
         }
 
@@ -71,11 +71,11 @@ final class ColumnStructure
 
     public function defaultInStub(): ?string
     {
-        if(! is_null($this->default) && $this->phpType() === 'string') {
+        if (! is_null($this->default) && $this->phpType() === 'string') {
             return "'" . trim($this->default, "'") . "'";
         }
 
-        if(
+        if (
             ! is_null($this->default)
             && ($this->phpType() === 'float' || $this->phpType() === 'int')
         ) {
@@ -98,7 +98,7 @@ final class ColumnStructure
             SqlTypeMap::HAS_ONE,
             SqlTypeMap::BELONGS_TO_MANY,
         ];
-        if(
+        if (
             ! in_array($this->type(), $notCheckRequiredField)
             && ! in_array('nullable()', $this->getMigrationMethods())
         ) {
@@ -148,10 +148,11 @@ final class ColumnStructure
     public function hasMultiple(): bool
     {
         foreach ($this->getResourceMethods() as $method) {
-            if(str_contains($method, 'multiple(')) {
+            if (str_contains($method, 'multiple(')) {
                 return true;
             }
         }
+
         return false;
     }
 
@@ -162,10 +163,11 @@ final class ColumnStructure
 
     public function rulesType(): ?string
     {
-        if($this->isFileType()) {
-            if($this->hasMultiple()) {
+        if ($this->isFileType()) {
+            if ($this->hasMultiple()) {
                 return 'array';
             }
+
             return 'file';
         }
 
@@ -175,19 +177,19 @@ final class ColumnStructure
             SqlTypeMap::DOUBLE,
         ];
 
-        if(in_array($this->type(), $floatTypes)) {
+        if (in_array($this->type(), $floatTypes)) {
             return 'numeric';
         }
 
-        if($this->inputType === 'number') {
+        if ($this->inputType === 'number') {
             return 'int';
         }
 
-        if($this->inputType === 'text') {
+        if ($this->inputType === 'text') {
             return 'string';
         }
 
-        if($this->inputType === 'checkbox') {
+        if ($this->inputType === 'checkbox') {
             return 'boolean';
         }
 
@@ -196,18 +198,18 @@ final class ColumnStructure
 
     public function phpType(): ?string
     {
-        if(
+        if (
             $this->type() === SqlTypeMap::HAS_MANY
             || $this->type() === SqlTypeMap::BELONGS_TO_MANY
         ) {
             return 'array';
         }
 
-        if($this->type() === SqlTypeMap::HAS_ONE) {
+        if ($this->type() === SqlTypeMap::HAS_ONE) {
             return $this->relation()?->table()->ucFirstSingular() . 'DTO';
         }
 
-        if(
+        if (
             $this->inputType === 'text'
             || $this->inputType === 'email'
             || $this->inputType === 'password'
@@ -215,11 +217,11 @@ final class ColumnStructure
             return 'string';
         }
 
-        if($this->type() === SqlTypeMap::BOOLEAN) {
+        if ($this->type() === SqlTypeMap::BOOLEAN) {
             return 'bool';
         }
 
-        if(
+        if (
             $this->type() === SqlTypeMap::DECIMAL
             || $this->type() === SqlTypeMap::DOUBLE
             || $this->type() === SqlTypeMap::FLOAT
@@ -227,7 +229,7 @@ final class ColumnStructure
             return 'float';
         }
 
-        if($this->inputType === 'number') {
+        if ($this->inputType === 'number') {
             return 'int';
         }
 
@@ -236,11 +238,11 @@ final class ColumnStructure
 
     public function setInputType(): void
     {
-        if(! is_null($this->inputType)) {
+        if (! is_null($this->inputType)) {
             return;
         }
 
-        if($this->column === 'email' || $this->column === 'password') {
+        if ($this->column === 'email' || $this->column === 'password') {
             $this->inputType = $this->column;
 
             return;
@@ -259,7 +261,7 @@ final class ColumnStructure
         $this->fieldClass = $fieldClass;
 
         // set json cast
-        if($this->cast === null && $this->isFileType() && $this->hasMultiple()) {
+        if ($this->cast === null && $this->isFileType() && $this->hasMultiple()) {
             $this->setCast('json');
         }
     }
@@ -296,9 +298,10 @@ final class ColumnStructure
 
     public function getMigrationMethods(): array
     {
-        if($this->isNullable() && ! in_array('nullable()', $this->migrationMethods)) {
+        if ($this->isNullable() && ! in_array('nullable()', $this->migrationMethods)) {
             $this->migrationMethods[] = 'nullable()';
         }
+
         return $this->migrationMethods;
     }
 
@@ -339,10 +342,11 @@ final class ColumnStructure
 
     public function getModelRelationName(): string
     {
-        if($this->relation()->modelRelationName() !== null) {
+        if ($this->relation()->modelRelationName() !== null) {
             return $this->relation()->modelRelationName();
         } else {
             $relation = $this->relation()->table()->str();
+
             return ($this->type() === SqlTypeMap::HAS_MANY || $this->type() === SqlTypeMap::BELONGS_TO_MANY)
                 ? $relation->plural()->camel()->value()
                 : $relation->singular()->camel()->value();

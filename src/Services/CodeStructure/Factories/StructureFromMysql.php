@@ -50,8 +50,9 @@ final readonly class StructureFromMysql implements MakeStructureContract
 
         $primaryKey = 'id';
         foreach ($indexes as $index) {
-            if($index['name'] === 'primary') {
+            if ($index['name'] === 'primary') {
                 $primaryKey = $index['columns'][0];
+
                 break;
             }
         }
@@ -119,7 +120,7 @@ final readonly class StructureFromMysql implements MakeStructureContract
                 required: false,
             );
 
-            if($this->isBelongsTo && isset($foreignList[$column['name']])) {
+            if ($this->isBelongsTo && isset($foreignList[$column['name']])) {
                 $columnStructure->setRelation(new RelationStructure(
                     foreignColumn: $foreignList[$column['name']]['foreign_column'],
                     modelRelationName: null,

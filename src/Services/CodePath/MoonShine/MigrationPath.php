@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace DevLnk\MoonShineBuilder\Services\CodePath\MoonShine;
 
-use DevLnk\MoonShineBuilder\Services\CodePath\AbstractPathItem;
 use DevLnk\MoonShineBuilder\Enums\BuildType;
+use DevLnk\MoonShineBuilder\Services\CodePath\AbstractPathItem;
 
 readonly class MigrationPath extends AbstractPathItem
 {

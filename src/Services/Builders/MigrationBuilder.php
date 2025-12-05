@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace DevLnk\MoonShineBuilder\Services\Builders;
 
+use DevLnk\MoonShineBuilder\Enums\BuildType;
 use DevLnk\MoonShineBuilder\Enums\SqlTypeMap;
+use DevLnk\MoonShineBuilder\Services\Builders\Contracts\MigrationBuilderContract;
 use DevLnk\MoonShineBuilder\Services\CodeStructure\ColumnStructure;
 use DevLnk\MoonShineBuilder\Services\StubBuilder;
-use DevLnk\MoonShineBuilder\Enums\BuildType;
-use DevLnk\MoonShineBuilder\Services\Builders\Contracts\MigrationBuilderContract;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
 
 class MigrationBuilder extends AbstractBuilder implements MigrationBuilderContract
@@ -42,7 +42,7 @@ class MigrationBuilder extends AbstractBuilder implements MigrationBuilderContra
         $result = "";
 
         foreach ($this->codeStructure->columns() as $column) {
-            if(
+            if (
                 $column->type() === SqlTypeMap::HAS_ONE
                 || $column->type() === SqlTypeMap::HAS_MANY
                 || $column->type() === SqlTypeMap::BELONGS_TO_MANY
@@ -50,13 +50,13 @@ class MigrationBuilder extends AbstractBuilder implements MigrationBuilderContra
                 continue;
             }
 
-            if($this->codeStructure->isTimestamps()
+            if ($this->codeStructure->isTimestamps()
                 && ($column->isCreatedAt() || $column->isUpdatedAt())
             ) {
                 continue;
             }
 
-            if($this->codeStructure->isSoftDeletes() && $column->isDeletedAt()) {
+            if ($this->codeStructure->isSoftDeletes() && $column->isDeletedAt()) {
                 continue;
             }
 
@@ -64,7 +64,8 @@ class MigrationBuilder extends AbstractBuilder implements MigrationBuilderContra
                 ->prepend("\t\t\t")
                 ->prepend("\n")
                 ->append($this->migrationName($column))
-                ->when($column->relation() === null,
+                ->when(
+                    $column->relation() === null,
                     // In relations fields, the methods are already substituted in migrationName,
                     // the rest must be added
                     fn ($str) => $str->append($this->migrationMethods($column))
@@ -79,7 +80,7 @@ class MigrationBuilder extends AbstractBuilder implements MigrationBuilderContra
 
     protected function migrationName(ColumnStructure $column): string
     {
-        if($column->relation()) {
+        if ($column->relation()) {
             return $this->migrationNameFromRelation($column);
         }
 
@@ -100,7 +101,7 @@ class MigrationBuilder extends AbstractBuilder implements MigrationBuilderContra
 
     public function migrationNameFromRelation(ColumnStructure $column): string
     {
-        if($column->type() !== SqlTypeMap::BELONGS_TO) {
+        if ($column->type() !== SqlTypeMap::BELONGS_TO) {
             return '';
         }
 
@@ -121,7 +122,7 @@ class MigrationBuilder extends AbstractBuilder implements MigrationBuilderContra
             ->append(')')
             ->when(
                 $column->getMigrationMethods() !== [],
-                fn($str) => $str
+                fn ($str) => $str
                     ->newLine()
                     ->append("\t\t\t\t")
                     ->append($this->migrationMethods($column))
@@ -143,12 +144,12 @@ class MigrationBuilder extends AbstractBuilder implements MigrationBuilderContra
     {
         $result = "";
 
-        if($column->getMigrationMethods() === []) {
+        if ($column->getMigrationMethods() === []) {
             return $result;
         }
 
         foreach ($column->getMigrationMethods() as $method) {
-            if(! str_contains($method, '(')) {
+            if (! str_contains($method, '(')) {
                 $method .= "()";
             }
             $result .= "->$method";

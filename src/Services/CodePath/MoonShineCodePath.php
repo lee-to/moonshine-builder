@@ -32,7 +32,7 @@ class MoonShineCodePath implements CodePathContract
         $time->addSeconds($this->iteration);
 
         $name = $codeStructure->entity()->ucFirstSingular();
-        
+
         $this
             ->setPath(
                 new ModelPath(
@@ -81,7 +81,7 @@ class MoonShineCodePath implements CodePathContract
 
     public function setPath(AbstractPathItem $path): self
     {
-        if(isset($this->paths[$path->getBuildAlias()])) {
+        if (isset($this->paths[$path->getBuildAlias()])) {
             return $this;
         }
         $this->paths[$path->getBuildAlias()] = $path;

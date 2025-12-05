@@ -15,9 +15,9 @@ final class MoonShineStructureFactory
     public function getStructures(ParseType $type, string $target): MakeStructureContract
     {
         return match ($type) {
-            ParseType::TABLE => StructureFromMysql::make(table: $target, entity: $target,isBelongsTo: true),
+            ParseType::TABLE => StructureFromMysql::make(table: $target, entity: $target, isBelongsTo: true),
             ParseType::JSON => StructureFromJson::make($this->getPath($target)),
-//            ParseType::OPENAPI => StructureFromOpenapi::make($this->getPath($target)),
+            //            ParseType::OPENAPI => StructureFromOpenapi::make($this->getPath($target)),
             default => throw new ProjectBuilderException('Parse type not found')
         };
     }
@@ -28,9 +28,10 @@ final class MoonShineStructureFactory
     private function getPath(string $target): string
     {
         $result = config('moonshine_builder.builds_dir') . '/' . $target;
-        if(! file_exists($result)) {
+        if (! file_exists($result)) {
             throw new ProjectBuilderException("File $result not found");
         }
+
         return $result;
     }
 }

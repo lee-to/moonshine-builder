@@ -59,7 +59,7 @@ class TodoBuildTest extends TestCase
             "->default('Низкий')",
             "public function filters(): iterable",
             "public function filters(): iterable",
-            "'title' => ['string', 'required']"
+            "'title' => ['string', 'required']",
         ];
         foreach ($resourceStringContains as $stringContain) {
             $this->assertStringContainsString($stringContain, $resource);
@@ -131,7 +131,7 @@ class TodoBuildTest extends TestCase
         $migrationFile = '';
         $migrations = $this->filesystem->allFiles($this->migrationPath);
         foreach ($migrations as $migration) {
-            if(str_contains((string) $migration, $migrationName)) {
+            if (str_contains((string) $migration, $migrationName)) {
                 $migrationFile = (string) $migration;
 
                 break;

@@ -43,7 +43,7 @@ class TestCase extends \Orchestra\Testbench\TestCase
         $this->artisan('optimize:clear');
 
         $dir = base_path('builds');
-        if(! is_dir($dir)) {
+        if (! is_dir($dir)) {
             mkdir($dir);
         }
 

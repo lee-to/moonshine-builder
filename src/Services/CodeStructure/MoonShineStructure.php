@@ -46,7 +46,7 @@ final readonly class MoonShineStructure
         $uses = [];
 
         foreach ($this->codeStructure->columns() as $column) {
-            if($column->isLaravelTimestamp()) {
+            if ($column->isLaravelTimestamp()) {
                 continue;
             }
 
@@ -61,10 +61,10 @@ final readonly class MoonShineStructure
                 ->value()
             ;
 
-            if(! is_null($column->relation())) {
+            if (! is_null($column->relation())) {
                 $relationResourceName = str($column->relation()->table()->camel())->singular()->ucfirst()->value();
-                if($relationResourceName !== $this->codeStructure->entity()->ucFirstSingular()) {
-                    if(str_contains($relationResourceName, 'Moonshine')) {
+                if ($relationResourceName !== $this->codeStructure->entity()->ucFirstSingular()) {
+                    if (str_contains($relationResourceName, 'Moonshine')) {
                         $relationResourceName = str_replace('Moonshine', 'MoonShine', $relationResourceName);
                     }
                     $resourceUse = str('use App\\MoonShine\\Resources\\')
@@ -76,13 +76,13 @@ final readonly class MoonShineStructure
                         )
                         ->append(';')
                         ->value();
-                    if(! in_array($resourceUse, $uses)) {
+                    if (! in_array($resourceUse, $uses)) {
                         $uses[] = $resourceUse;
                     }
                 }
             }
 
-            if(in_array($use, $uses)) {
+            if (in_array($use, $uses)) {
                 continue;
             }
 
@@ -101,11 +101,11 @@ final readonly class MoonShineStructure
         $fields = [];
 
         foreach ($this->codeStructure->columns() as $column) {
-            if($column->isLaravelTimestamp()) {
+            if ($column->isLaravelTimestamp()) {
                 continue;
             }
 
-            if($onlyFilters && ! $column->hasFilter()) {
+            if ($onlyFilters && ! $column->hasFilter()) {
                 continue;
             }
 
@@ -114,10 +114,10 @@ final readonly class MoonShineStructure
                 : $this->fieldMap->getMoonShineFieldFromSqlType($column->type())
             ;
 
-            if(! is_null($column->relation())) {
+            if (! is_null($column->relation())) {
                 $resourceName = str($column->relation()->table()->camel())->singular()->ucfirst()->value();
 
-                if(str_contains($resourceName, 'Moonshine')) {
+                if (str_contains($resourceName, 'Moonshine')) {
                     $resourceName = str_replace('Moonshine', 'MoonShine', $resourceName);
                 }
 
@@ -164,11 +164,11 @@ final readonly class MoonShineStructure
         $rules = [];
 
         foreach ($this->codeStructure->columns() as $column) {
-            if($column->isId()) {
+            if ($column->isId()) {
                 continue;
             }
 
-            if(
+            if (
                 in_array($column->column(), $this->codeStructure->dateColumns())
                 || in_array($column->type(), $this->codeStructure->noInputType())
             ) {
@@ -193,7 +193,7 @@ final readonly class MoonShineStructure
     {
         $withArray = [];
         foreach ($this->codeStructure->columns() as $column) {
-            if(! $column->relation()) {
+            if (! $column->relation()) {
                 continue;
             }
             $withArray[] = $column->getModelRelationName();
@@ -204,7 +204,7 @@ final readonly class MoonShineStructure
 
     private function resourceMethods(ColumnStructure $columnStructure, int $tabulation = 0): string
     {
-        if($columnStructure->getResourceMethods() === []) {
+        if ($columnStructure->getResourceMethods() === []) {
             return '';
         }
 
@@ -213,12 +213,13 @@ final readonly class MoonShineStructure
         $result = "";
 
         foreach ($columnStructure->getResourceMethods() as $method) {
-            if(! str_contains($method, '(')) {
+            if (! str_contains($method, '(')) {
                 $method .= "()";
             }
             $result .= str('')
-                    ->when($tabulation > 0,
-                        fn($str) => $str->newLine()->append($tabStr)
+                    ->when(
+                        $tabulation > 0,
+                        fn ($str) => $str->newLine()->append($tabStr)
                     )
                     ->value() . "->$method";
         }

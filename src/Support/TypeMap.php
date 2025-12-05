@@ -7,7 +7,6 @@ namespace DevLnk\MoonShineBuilder\Support;
 use DevLnk\MoonShineBuilder\Enums\SqlTypeMap;
 use DevLnk\MoonShineBuilder\Exceptions\ProjectBuilderException;
 use Illuminate\Support\Facades\File;
-
 use MoonShine\Core\Core;
 use MoonShine\Laravel\Fields\Relationships\BelongsTo;
 use MoonShine\Laravel\Fields\Relationships\BelongsToMany;

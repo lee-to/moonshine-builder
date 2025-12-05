@@ -30,15 +30,15 @@ final class CodeStructureList
     {
         $resources = [];
 
-        if(! empty($pivotTables)) {
+        if (! empty($pivotTables)) {
             foreach ($this->codeStructures as $key => $codeStructure) {
-                if(! in_array($codeStructure->table(), $pivotTables)) {
+                if (! in_array($codeStructure->table(), $pivotTables)) {
                     continue;
                 }
 
                 $pivotColumns = [];
                 foreach ($codeStructure->columns() as $column) {
-                    if($column->type() !== SqlTypeMap::BELONGS_TO) {
+                    if ($column->type() !== SqlTypeMap::BELONGS_TO) {
                         continue;
                     }
                     $pivotColumns[] = [
@@ -47,7 +47,7 @@ final class CodeStructureList
                     ];
                 }
 
-                if(count($pivotColumns) !== 2) {
+                if (count($pivotColumns) !== 2) {
                     unset($this->codeStructures[$key]);
 
                     continue;
@@ -71,7 +71,7 @@ final class CodeStructureList
                 ];
 
                 foreach ($this->codeStructures as $findCodeStructure) {
-                    if(! isset($pivotColumnsResult[$findCodeStructure->entity()->raw()])) {
+                    if (! isset($pivotColumnsResult[$findCodeStructure->entity()->raw()])) {
                         continue;
                     }
 
@@ -113,16 +113,16 @@ final class CodeStructureList
                     'title',
                 ];
 
-                if(in_array($column->column(), $resourceColumnProperties)) {
+                if (in_array($column->column(), $resourceColumnProperties)) {
                     $codeStructure->setColumnName($column->column());
                 }
 
-                if($column->relation()) {
+                if ($column->relation()) {
                     $field['relation']['table'] = $column->relation()->table()->raw();
                     $field['relation']['foreign_column'] = $column->relation()->foreignColumn();
                 }
 
-                if(
+                if (
                     $column->column() === 'moonshine_user_id'
                     && $column->type() === SqlTypeMap::BELONGS_TO
                 ) {

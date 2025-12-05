@@ -10,7 +10,6 @@ use DevLnk\MoonShineBuilder\Services\CodeStructure\CodeStructure;
 use DevLnk\MoonShineBuilder\Services\CodeStructure\CodeStructureList;
 use DevLnk\MoonShineBuilder\Services\CodeStructure\ColumnStructure;
 use DevLnk\MoonShineBuilder\Services\CodeStructure\RelationStructure;
-use Throwable;
 use ValueError;
 
 final readonly class StructureFromArray implements MakeStructureContract
@@ -27,7 +26,7 @@ final readonly class StructureFromArray implements MakeStructureContract
     {
         $codeStructures = new CodeStructureList();
 
-        if(! isset($this->data['resources'])) {
+        if (! isset($this->data['resources'])) {
             throw new ProjectBuilderException('No resources array found.');
         }
 
@@ -36,19 +35,19 @@ final readonly class StructureFromArray implements MakeStructureContract
 
             $codeStructure = new CodeStructure($table, $resource['name']);
 
-            if(isset($resource['withModel'])) {
+            if (isset($resource['withModel'])) {
                 $codeStructure->setWithModel($resource['withModel']);
             }
 
-            if(isset($resource['withMigration'])) {
+            if (isset($resource['withMigration'])) {
                 $codeStructure->setWithMigration($resource['withMigration']);
             }
 
-            if(isset($resource['withResource'])) {
+            if (isset($resource['withResource'])) {
                 $codeStructure->setWithResource($resource['withResource']);
             }
 
-            if(isset($resource['menuName'])) {
+            if (isset($resource['menuName'])) {
                 $codeStructure->setMenuName($resource['menuName']);
             }
 
@@ -70,8 +69,8 @@ final readonly class StructureFromArray implements MakeStructureContract
                     required: $field['required'] ?? false,
                 );
 
-                if(! empty($field['relation'])) {
-                    if(
+                if (! empty($field['relation'])) {
+                    if (
                         ! isset($field['relation']['foreign_key'])
                         && (
                             $columnStructure->type() === SqlTypeMap::BELONGS_TO
@@ -81,7 +80,7 @@ final readonly class StructureFromArray implements MakeStructureContract
                         $field['relation']['foreign_key'] = 'id';
                     }
 
-                    if(! isset($field['relation']['foreign_key'])) {
+                    if (! isset($field['relation']['foreign_key'])) {
                         throw new ProjectBuilderException("For column '{$field['column']}' in the relation parameter, you must specify 'foreign_key'.");
                     }
 
@@ -92,61 +91,61 @@ final readonly class StructureFromArray implements MakeStructureContract
                     ));
                 }
 
-                if(isset($field['hasFilter'])) {
+                if (isset($field['hasFilter'])) {
                     $columnStructure->setHasFilter($field['hasFilter']);
                 }
 
-                if(isset($field['default'])) {
+                if (isset($field['default'])) {
                     $defaultValue = "default({$field['default']})";
-                    if($columnStructure->inputType() === 'text') {
+                    if ($columnStructure->inputType() === 'text') {
                         $defaultValue = "default('{$field['default']}')";
                     } elseif (is_bool($field['default'])) {
                         $defaultValue = $field['default'] ? "default(true)" : "default(false)";
                     }
 
-                    if(! isset($field['methods'])) {
+                    if (! isset($field['methods'])) {
                         $field['methods'][] = $defaultValue;
                     } else {
                         array_unshift($field['methods'], $defaultValue);
                     }
 
-                    if(! isset($field['migration']['methods'])) {
+                    if (! isset($field['migration']['methods'])) {
                         $field['migration']['methods'][] = $defaultValue;
                     } else {
                         array_unshift($field['migration']['methods'], $defaultValue);
                     }
                 }
 
-                if(! empty($field['migration'])) {
-                    if(! empty($field['migration']['options'])) {
+                if (! empty($field['migration'])) {
+                    if (! empty($field['migration']['options'])) {
                         $columnStructure->setMigrationOptions($field['migration']['options']);
                     }
 
-                    if(! empty($field['migration']['methods'])) {
+                    if (! empty($field['migration']['methods'])) {
                         $columnStructure->setMigrationMethods($field['migration']['methods']);
                     }
                 }
 
-                if(! empty($field['resource_class'])) {
+                if (! empty($field['resource_class'])) {
                     $columnStructure->setResourceClass($field['resource_class']);
                 }
 
-                if(! empty($field['model_class'])) {
+                if (! empty($field['model_class'])) {
                     $columnStructure->setModelClass($field['model_class']);
                 }
 
-                if(! empty($field['methods'])) {
+                if (! empty($field['methods'])) {
                     $columnStructure->setResourceMethods($field['methods']);
                 }
 
-                if(! empty($field['field'])) {
+                if (! empty($field['field'])) {
                     $columnStructure->setFieldClass($field['field']);
                 }
 
                 $codeStructure->addColumn($columnStructure);
             }
 
-            if(isset($resource['timestamps']) && $resource['timestamps'] === true) {
+            if (isset($resource['timestamps']) && $resource['timestamps'] === true) {
                 $createdAtField = new ColumnStructure(
                     column: 'created_at',
                     name: 'Created at',
@@ -168,7 +167,7 @@ final readonly class StructureFromArray implements MakeStructureContract
                 $codeStructure->addColumn($updatedAtField);
             }
 
-            if(isset($resource['soft_deletes']) && $resource['soft_deletes'] === true) {
+            if (isset($resource['soft_deletes']) && $resource['soft_deletes'] === true) {
                 $softDeletes = new ColumnStructure(
                     column: 'deleted_at',
                     name: 'Deleted at',

@@ -87,7 +87,7 @@ class ModelBuilder extends AbstractBuilder implements ModelBuilderContract
         $result = "";
 
         foreach ($this->codeStructure->columns() as $column) {
-            if(
+            if (
                 $column->type()->isIdType()
                 || in_array($column->type(), $this->codeStructure->noFillableType())
                 || $column->isLaravelTimestamp()
@@ -111,7 +111,7 @@ class ModelBuilder extends AbstractBuilder implements ModelBuilderContract
         $result = "";
 
         foreach ($this->codeStructure->columns() as $column) {
-            if($column->getCast() === null) {
+            if ($column->getCast() === null) {
                 continue;
             }
 
@@ -136,7 +136,7 @@ class ModelBuilder extends AbstractBuilder implements ModelBuilderContract
         $result = str('');
 
         foreach ($this->codeStructure->columns() as $column) {
-            if(is_null($column->relation())) {
+            if (is_null($column->relation())) {
                 continue;
             }
 
@@ -148,12 +148,12 @@ class ModelBuilder extends AbstractBuilder implements ModelBuilderContract
                 default => ''
             };
 
-            if(empty($stubName)) {
+            if (empty($stubName)) {
                 continue;
             }
 
             $stubBuilder = StubBuilder::make($this->codeStructure->stubDir() . $stubName);
-            if($column->type() === SqlTypeMap::BELONGS_TO) {
+            if ($column->type() === SqlTypeMap::BELONGS_TO) {
                 $stubBuilder->setKey(
                     '{relation_id}',
                     ", '{$column->relation()->foreignColumn()}'",
@@ -189,6 +189,7 @@ class ModelBuilder extends AbstractBuilder implements ModelBuilderContract
         foreach ($this->codeStructure->columns() as $column) {
             $count += $column->getCast() !== null ? 1 : 0;
         }
+
         return $count;
     }
 }
