@@ -10,13 +10,15 @@ use DevLnk\MoonShineBuilder\Exceptions\ProjectBuilderException;
 final class MoonShineStructureFactory
 {
     /**
+     * @param string|class-string<\Illuminate\Database\Eloquent\Model> $target
      * @throws ProjectBuilderException
      */
     public function getStructures(ParseType $type, string $target): MakeStructureContract
     {
         return match ($type) {
-            ParseType::TABLE => StructureFromMysql::make(table: $target, entity: $target,isBelongsTo: true),
+            ParseType::TABLE => StructureFromMysql::make(table: $target, entity: $target, isBelongsTo: true),
             ParseType::JSON => StructureFromJson::make($this->getPath($target)),
+            ParseType::MODEL => StructureFromModel::make($target),
 //            ParseType::OPENAPI => StructureFromOpenapi::make($this->getPath($target)),
             default => throw new ProjectBuilderException('Parse type not found')
         };

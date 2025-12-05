@@ -17,12 +17,15 @@ use DevLnk\MoonShineBuilder\Services\CodeStructure\CodeStructure;
 use DevLnk\MoonShineBuilder\Services\CodeStructure\Factories\MoonShineStructureFactory;
 use DevLnk\MoonShineBuilder\Services\StubBuilder;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Schema;
 use MoonShine\Laravel\Commands\MoonShineCommand;
+use ReflectionClass;
 use SplFileInfo;
+use Symfony\Component\Finder\Finder;
 
 use function Laravel\Prompts\{confirm, note, select};
 
@@ -170,12 +173,12 @@ class MoonShineBuildCommand extends MoonShineCommand
         if (is_null($target) && $this->parseType === ParseType::JSON) {
             $target = $this->getFileList('json');
         }
-        
+
 //        if (is_null($target) && $this->parseType === ParseType::OPENAPI) {
 //            $target = $this->getFileList('yaml');
 //        }
 
-        if($this->parseType === ParseType::TABLE) {
+        if ($this->parseType === ParseType::TABLE) {
             $target = select(
                 'Table',
                 collect(Schema::getTables())
@@ -187,9 +190,36 @@ class MoonShineBuildCommand extends MoonShineCommand
             $this->builders = array_filter($this->builders, fn ($item) => $item !== BuildType::MIGRATION);
         }
 
+        if ($this->parseType === ParseType::MODEL) {
+            $selectedModels = $this->getModelSelection($target);
+
+            $this->builders = array_filter($this->builders, fn ($item) => ! in_array($item, [
+                BuildType::MIGRATION,
+                BuildType::MODEL,
+            ]));
+
+            return $this->buildCodeStructuresFromModels($selectedModels);
+        }
+
         $codeStructures = (new MoonShineStructureFactory())->getStructures($this->parseType, $target);
 
         return $codeStructures->makeStructures()->codeStructures();
+    }
+
+    /**
+     * @param array<int, class-string<Model>> $models
+     * @return array<int, CodeStructure>
+     */
+    protected function buildCodeStructuresFromModels(array $models): array
+    {
+        $result = [];
+
+        foreach ($models as $modelClass) {
+            $codeStructures = (new MoonShineStructureFactory())->getStructures(ParseType::MODEL, $modelClass);
+            $result = array_merge($result, $codeStructures->makeStructures()->codeStructures());
+        }
+
+        return $result;
     }
 
     protected function getFileList(string $extension): int|string
@@ -349,6 +379,123 @@ class MoonShineBuildCommand extends MoonShineCommand
             BuildType::INDEX_PAGE,
             BuildType::FORM_PAGE,
             BuildType::DETAIL_PAGE,
+        ];
+    }
+
+    /**
+     * @return array<int, class-string<Model>>
+     */
+    protected function getModelSelection(?string $filter): array
+    {
+        $modelsPath = app_path('Models');
+
+        if (! File::isDirectory($modelsPath)) {
+            $this->error("Directory not found: $modelsPath");
+            exit(self::FAILURE);
+        }
+
+        $models = $this->findModels($modelsPath);
+
+        if (empty($models)) {
+            $this->error('No models found in ' . $modelsPath);
+            exit(self::FAILURE);
+        }
+
+        $modelsList = collect($models)
+            ->filter(fn ($class) => ! in_array(class_basename($class), $this->getExcludedModels()))
+            ->filter(fn ($class) => is_null($filter) || str_contains(strtolower(class_basename($class)), strtolower($filter)))
+            ->mapWithKeys(fn ($class) => [$class => class_basename($class)]);
+
+        if ($modelsList->isEmpty()) {
+            $this->error('No eligible models found');
+            exit(self::FAILURE);
+        }
+
+        $options = collect(['__all__' => 'All'])->merge($modelsList)->toArray();
+
+        $selected = select(
+            'Model',
+            $options,
+        );
+
+        if ($selected === '__all__') {
+            return $modelsList->keys()->toArray();
+        }
+
+        return [$selected];
+    }
+
+    /**
+     * @return array<int, class-string<Model>>
+     */
+    protected function findModels(string $path): array
+    {
+        $models = [];
+        $namespace = $this->getModelsNamespace($path);
+
+        $finder = new Finder();
+        $finder->files()->in($path)->name('*.php');
+
+        foreach ($finder as $file) {
+            $relativePath = $file->getRelativePath();
+            $className = $file->getBasename('.php');
+
+            $fullClass = $namespace;
+            if ($relativePath) {
+                $fullClass .= '\\' . str_replace('/', '\\', $relativePath);
+            }
+            $fullClass .= '\\' . $className;
+
+            if (! class_exists($fullClass)) {
+                continue;
+            }
+
+            try {
+                $reflection = new ReflectionClass($fullClass);
+
+                if (
+                    $reflection->isAbstract()
+                    || ! $reflection->isSubclassOf(Model::class)
+                ) {
+                    continue;
+                }
+
+                $models[] = $fullClass;
+            } catch (\Throwable) {
+                continue;
+            }
+        }
+
+        return $models;
+    }
+
+    protected function getModelsNamespace(string $path): string
+    {
+        $appPath = app_path();
+
+        if (str_starts_with($path, $appPath)) {
+            $relativePath = substr($path, strlen($appPath));
+            $relativePath = ltrim($relativePath, '/\\');
+
+            $namespace = 'App';
+            if ($relativePath) {
+                $namespace .= '\\' . str_replace('/', '\\', $relativePath);
+            }
+
+            return $namespace;
+        }
+
+        return 'App\\Models';
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    protected function getExcludedModels(): array
+    {
+        return [
+            'MoonshineUser',
+            'MoonshineUserRole',
         ];
     }
 }

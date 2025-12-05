@@ -10,6 +10,8 @@ enum ParseType: string
 
     case JSON = 'json';
 
+    case MODEL = 'model';
+
     //case OPENAPI = 'openapi';
 
     case CONSOLE = 'console';
@@ -19,6 +21,7 @@ enum ParseType: string
         return match ($this) {
             self::TABLE => 'table',
             self::JSON => 'json',
+            self::MODEL => 'model',
             self::CONSOLE => 'console',
             //self::OPENAPI => 'openapi yaml (beta)',
         };
