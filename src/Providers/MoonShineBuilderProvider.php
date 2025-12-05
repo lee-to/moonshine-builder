@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace DevLnk\MoonShineBuilder\Providers;
 
 use DevLnk\MoonShineBuilder\Commands\MoonShineBuildCommand;
+use DevLnk\MoonShineBuilder\Commands\MoonShineModelSchemaCommand;
 use DevLnk\MoonShineBuilder\Commands\MoonShineProjectSchemaCommand;
 use DevLnk\MoonShineBuilder\Commands\ResourceBuildCommand;
 use DevLnk\MoonShineBuilder\Commands\TypeCommand;
@@ -26,6 +27,7 @@ class MoonShineBuilderProvider extends ServiceProvider
 {
     protected array $commands = [
         MoonShineBuildCommand::class,
+        MoonShineModelSchemaCommand::class,
         MoonShineProjectSchemaCommand::class,
         ResourceBuildCommand::class,
         TypeCommand::class,
