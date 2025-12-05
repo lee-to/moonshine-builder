@@ -72,7 +72,7 @@ class MoonShineModelSchemaCommand extends Command
 
         foreach ($selectedModels as $modelClass) {
             $codeStructures->addCodeStructure(
-                StructureFromModel::make($modelClass)->makeStructure()
+                StructureFromModel::fromModel($modelClass)->makeStructure($modelClass)
             );
         }
 

@@ -15,47 +15,67 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Schema;
 use ReflectionClass;
 use ReflectionMethod;
+use Symfony\Component\Finder\Finder;
+
+use function Laravel\Prompts\select;
 
 final readonly class StructureFromModel implements MakeStructureContract
 {
     /**
-     * @param class-string<Model> $modelClass
+     * @param array<int, class-string<Model>> $modelClasses
      */
     public function __construct(
-        private string $modelClass,
+        private array $modelClasses,
     ) {
+    }
+
+    /**
+     * @param class-string<Model>|null $filter
+     */
+    public static function make(?string $filter = null): static
+    {
+        $modelClasses = self::getModelSelection($filter);
+
+        return new static($modelClasses);
     }
 
     /**
      * @param class-string<Model> $modelClass
      */
-    public static function make(string $modelClass): static
+    public static function fromModel(string $modelClass): static
     {
-        return new static($modelClass);
+        return new static([$modelClass]);
     }
 
     public function makeStructures(): CodeStructureList
     {
         $codeStructureList = new CodeStructureList();
-        $codeStructureList->addCodeStructure($this->makeStructure());
+
+        foreach ($this->modelClasses as $modelClass) {
+            $codeStructureList->addCodeStructure($this->makeStructure($modelClass));
+        }
 
         return $codeStructureList;
     }
 
-    public function makeStructure(): CodeStructure
+    /**
+     * @param class-string<Model> $modelClass
+     */
+    public function makeStructure(string $modelClass): CodeStructure
     {
         /** @var Model $model */
-        $model = new $this->modelClass();
+        $model = new $modelClass();
         $table = $model->getTable();
-        $entity = class_basename($this->modelClass);
+        $entity = class_basename($modelClass);
 
         $codeStructure = new CodeStructure($table, $entity);
 
         $this->processColumns($model, $codeStructure);
-        $this->processRelations($model, $codeStructure);
+        $this->processRelations($model, $modelClass, $codeStructure);
 
         return $codeStructure;
     }
@@ -127,13 +147,16 @@ final readonly class StructureFromModel implements MakeStructureContract
         }
     }
 
-    private function processRelations(Model $model, CodeStructure $codeStructure): void
+    /**
+     * @param class-string<Model> $modelClass
+     */
+    private function processRelations(Model $model, string $modelClass, CodeStructure $codeStructure): void
     {
         $reflection = new ReflectionClass($model);
         $methods = $reflection->getMethods(ReflectionMethod::IS_PUBLIC);
 
         foreach ($methods as $method) {
-            if ($method->class !== $this->modelClass) {
+            if ($method->class !== $modelClass) {
                 continue;
             }
 
@@ -362,8 +385,117 @@ final readonly class StructureFromModel implements MakeStructureContract
         return null;
     }
 
-    public function hasSoftDeletes(): bool
+    /**
+     * @return array<int, class-string<Model>>
+     */
+    private static function getModelSelection(?string $filter): array
     {
-        return in_array(SoftDeletes::class, class_uses_recursive($this->modelClass));
+        $modelsPath = app_path('Models');
+
+        if (! File::isDirectory($modelsPath)) {
+            return [];
+        }
+
+        $models = self::findModels($modelsPath);
+
+        if (empty($models)) {
+            return [];
+        }
+
+        $modelsList = collect($models)
+            ->filter(fn ($class) => ! in_array(class_basename($class), self::getExcludedModels()))
+            ->filter(fn ($class) => is_null($filter) || str_contains(strtolower(class_basename($class)), strtolower($filter)))
+            ->mapWithKeys(fn ($class) => [$class => class_basename($class)]);
+
+        if ($modelsList->isEmpty()) {
+            return [];
+        }
+
+        $options = collect(['__all__' => 'All'])->merge($modelsList)->toArray();
+
+        $selected = select(
+            'Model',
+            $options,
+        );
+
+        if ($selected === '__all__') {
+            return $modelsList->keys()->toArray();
+        }
+
+        return [$selected];
+    }
+
+    /**
+     * @return array<int, class-string<Model>>
+     */
+    private static function findModels(string $path): array
+    {
+        $models = [];
+        $namespace = self::getModelsNamespace($path);
+
+        $finder = new Finder();
+        $finder->files()->in($path)->name('*.php');
+
+        foreach ($finder as $file) {
+            $relativePath = $file->getRelativePath();
+            $className = $file->getBasename('.php');
+
+            $fullClass = $namespace;
+            if ($relativePath) {
+                $fullClass .= '\\' . str_replace('/', '\\', $relativePath);
+            }
+            $fullClass .= '\\' . $className;
+
+            if (! class_exists($fullClass)) {
+                continue;
+            }
+
+            try {
+                $reflection = new ReflectionClass($fullClass);
+
+                if (
+                    $reflection->isAbstract()
+                    || ! $reflection->isSubclassOf(Model::class)
+                ) {
+                    continue;
+                }
+
+                $models[] = $fullClass;
+            } catch (\Throwable) {
+                continue;
+            }
+        }
+
+        return $models;
+    }
+
+    private static function getModelsNamespace(string $path): string
+    {
+        $appPath = app_path();
+
+        if (str_starts_with($path, $appPath)) {
+            $relativePath = substr($path, strlen($appPath));
+            $relativePath = ltrim($relativePath, '/\\');
+
+            $namespace = 'App';
+            if ($relativePath) {
+                $namespace .= '\\' . str_replace('/', '\\', $relativePath);
+            }
+
+            return $namespace;
+        }
+
+        return 'App\\Models';
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    private static function getExcludedModels(): array
+    {
+        return [
+            'MoonshineUser',
+            'MoonshineUserRole',
+        ];
     }
 }

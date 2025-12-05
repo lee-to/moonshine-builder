@@ -30,7 +30,7 @@ class StructureFromModelTest extends TestCase
 
         foreach ($models as $modelClass) {
             $codeStructures->addCodeStructure(
-                StructureFromModel::make($modelClass)->makeStructure()
+                StructureFromModel::fromModel($modelClass)->makeStructure($modelClass)
             );
         }
 
@@ -52,7 +52,7 @@ class StructureFromModelTest extends TestCase
     #[Test]
     public function it_generates_user_structure_with_three_relations(): void
     {
-        $structure = StructureFromModel::make(User::class)->makeStructure();
+        $structure = StructureFromModel::fromModel(User::class)->makeStructure(User::class);
 
         $this->assertEquals('User', $structure->entity()->ucFirst());
         $this->assertEquals('users', $structure->table());
@@ -110,7 +110,7 @@ class StructureFromModelTest extends TestCase
 
         foreach ($models as $modelClass) {
             $codeStructures->addCodeStructure(
-                StructureFromModel::make($modelClass)->makeStructure()
+                StructureFromModel::fromModel($modelClass)->makeStructure($modelClass)
             );
         }
 
@@ -158,17 +158,17 @@ class StructureFromModelTest extends TestCase
     #[Test]
     public function it_detects_timestamps(): void
     {
-        $structure = StructureFromModel::make(User::class)->makeStructure();
+        $structure = StructureFromModel::fromModel(User::class)->makeStructure(User::class);
         $this->assertTrue($structure->isTimestamps());
 
-        $categoryStructure = StructureFromModel::make(Category::class)->makeStructure();
+        $categoryStructure = StructureFromModel::fromModel(Category::class)->makeStructure(Category::class);
         $this->assertTrue($categoryStructure->isTimestamps());
     }
 
     #[Test]
     public function it_processes_casts_correctly(): void
     {
-        $structure = StructureFromModel::make(User::class)->makeStructure();
+        $structure = StructureFromModel::fromModel(User::class)->makeStructure(User::class);
         $columns = $structure->columns();
 
         $isActiveColumn = $this->findColumnByName($columns, 'is_active');
