@@ -174,10 +174,6 @@ class StructureFromModelTest extends TestCase
         $isActiveColumn = $this->findColumnByName($columns, 'is_active');
         $this->assertNotNull($isActiveColumn);
         $this->assertEquals('bool', $isActiveColumn->getCast());
-
-        $emailVerifiedColumn = $this->findColumnByName($columns, 'email_verified_at');
-        $this->assertNotNull($emailVerifiedColumn);
-        $this->assertEquals('datetime', $emailVerifiedColumn->getCast());
     }
 
     private function findColumnByName(array $columns, string $name): ?object

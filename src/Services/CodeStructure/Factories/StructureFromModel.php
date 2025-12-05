@@ -16,7 +16,6 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\File;
-use Illuminate\Support\Facades\Schema;
 use ReflectionClass;
 use ReflectionMethod;
 use Symfony\Component\Finder\Finder;
@@ -82,69 +81,79 @@ final readonly class StructureFromModel implements MakeStructureContract
 
     private function processColumns(Model $model, CodeStructure $codeStructure): void
     {
-        $table = $model->getTable();
-        $columns = Schema::getColumns($table);
-        $indexes = Schema::getIndexes($table);
         $primaryKey = $model->getKeyName();
-
-        foreach ($indexes as $index) {
-            if ($index['name'] === 'primary') {
-                $primaryKey = $index['columns'][0];
-                break;
-            }
-        }
-
         $casts = $model->getCasts();
+        $fillable = $model->getFillable();
 
-        foreach ($columns as $column) {
-            $type = $column['name'] === $primaryKey
-                ? 'primary'
-                : preg_replace("/[0-9]+|\(|\)|,/", '', $column['type']);
+        $idColumn = new ColumnStructure(
+            column: $primaryKey,
+            name: $primaryKey,
+            type: SqlTypeMap::fromSqlType('primary'),
+            default: null,
+            nullable: false,
+            required: false,
+        );
+        $codeStructure->addColumn($idColumn);
 
-            if ($type === 'primary') {
-                $column['default'] = null;
-            }
-
-            if (! is_null($column['default']) && str_contains($column['default'], '::')) {
-                $column['default'] = substr(
-                    $column['default'],
-                    0,
-                    strpos($column['default'], '::')
-                );
-            }
-
-            $type = $column['type'] === 'tinyint(1)' ? 'boolean' : $type;
-
-            if ($type === 'boolean' && ! is_null($column['default'])) {
-                if ($column['default'] !== 'false' && $column['default'] !== true) {
-                    $column['default'] = $column['default'] ? 'true' : 'false';
-                }
-            }
-
-            if (
-                $column['default'] === 'current_timestamp()'
-                || $column['default'] === 'CURRENT_TIMESTAMP'
-            ) {
-                $column['default'] = '';
-            }
-
-            $sqlType = SqlTypeMap::fromSqlType($type);
+        foreach ($fillable as $columnName) {
+            $type = $this->getTypeFromCast($casts[$columnName] ?? null);
 
             $columnStructure = new ColumnStructure(
-                column: $column['name'],
-                name: $column['name'],
-                type: $sqlType,
-                default: $column['default'],
-                nullable: $column['nullable'],
+                column: $columnName,
+                name: $columnName,
+                type: $type,
+                default: null,
+                nullable: true,
                 required: false,
             );
 
-            if (isset($casts[$column['name']])) {
-                $columnStructure->setCast($this->normalizeCast($casts[$column['name']]));
+            if (isset($casts[$columnName])) {
+                $columnStructure->setCast($this->normalizeCast($casts[$columnName]));
             }
 
             $codeStructure->addColumn($columnStructure);
         }
+
+        if ($model->usesTimestamps()) {
+            $createdAt = new ColumnStructure(
+                column: $model->getCreatedAtColumn(),
+                name: $model->getCreatedAtColumn(),
+                type: SqlTypeMap::fromSqlType('timestamp'),
+                default: null,
+                nullable: true,
+                required: false,
+            );
+            $codeStructure->addColumn($createdAt);
+
+            $updatedAt = new ColumnStructure(
+                column: $model->getUpdatedAtColumn(),
+                name: $model->getUpdatedAtColumn(),
+                type: SqlTypeMap::fromSqlType('timestamp'),
+                default: null,
+                nullable: true,
+                required: false,
+            );
+            $codeStructure->addColumn($updatedAt);
+        }
+    }
+
+    private function getTypeFromCast(?string $cast): SqlTypeMap
+    {
+        if ($cast === null) {
+            return SqlTypeMap::fromSqlType('varchar');
+        }
+
+        return match ($cast) {
+            'int', 'integer' => SqlTypeMap::fromSqlType('int'),
+            'real', 'float', 'double', 'decimal' => SqlTypeMap::fromSqlType('float'),
+            'string' => SqlTypeMap::fromSqlType('varchar'),
+            'bool', 'boolean' => SqlTypeMap::fromSqlType('boolean'),
+            'array', 'json', 'object', 'collection' => SqlTypeMap::fromSqlType('json'),
+            'date' => SqlTypeMap::fromSqlType('date'),
+            'datetime', 'immutable_date', 'immutable_datetime', 'timestamp' => SqlTypeMap::fromSqlType('timestamp'),
+            'hashed' => SqlTypeMap::fromSqlType('varchar'),
+            default => SqlTypeMap::fromSqlType('varchar'),
+        };
     }
 
     /**
@@ -201,35 +210,21 @@ final readonly class StructureFromModel implements MakeStructureContract
             $relatedModel = $relation->getRelated();
             $foreignKey = $relation->getForeignKeyName();
 
-            foreach ($codeStructure->columns() as $column) {
-                if ($column->column() === $foreignKey) {
-                    $column->setRelation(new RelationStructure(
-                        foreignColumn: $relatedModel->getKeyName(),
-                        modelRelationName: $methodName,
-                        table: $relatedModel->getTable()
-                    ));
+            $columnStructure = new ColumnStructure(
+                column: $foreignKey,
+                name: $foreignKey,
+                type: SqlTypeMap::BELONGS_TO,
+                default: null,
+                nullable: true,
+                required: false,
+            );
+            $columnStructure->setRelation(new RelationStructure(
+                foreignColumn: $relatedModel->getKeyName(),
+                modelRelationName: $methodName,
+                table: $relatedModel->getTable()
+            ));
 
-                    $existingType = $column->type();
-                    if ($existingType !== SqlTypeMap::BELONGS_TO) {
-                        $newColumn = new ColumnStructure(
-                            column: $column->column(),
-                            name: $column->name(),
-                            type: SqlTypeMap::BELONGS_TO,
-                            default: $column->default(),
-                            nullable: $column->isNullable(),
-                            required: $column->isRequired(),
-                        );
-                        $newColumn->setRelation(new RelationStructure(
-                            foreignColumn: $relatedModel->getKeyName(),
-                            modelRelationName: $methodName,
-                            table: $relatedModel->getTable()
-                        ));
-
-                        $this->replaceColumn($codeStructure, $foreignKey, $newColumn);
-                    }
-                    return;
-                }
-            }
+            $this->replaceColumn($codeStructure, $foreignKey, $columnStructure);
         }
 
         if ($relation instanceof HasMany) {
@@ -300,11 +295,18 @@ final readonly class StructureFromModel implements MakeStructureContract
         $property->setAccessible(true);
 
         $columns = $property->getValue($codeStructure);
+        $found = false;
+
         foreach ($columns as $key => $column) {
             if ($column->column() === $columnName) {
                 $columns[$key] = $newColumn;
+                $found = true;
                 break;
             }
+        }
+
+        if (! $found) {
+            $columns[] = $newColumn;
         }
 
         $property->setValue($codeStructure, $columns);
